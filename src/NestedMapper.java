@@ -14,6 +14,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -67,7 +68,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	   */
 	  
 	  // Hacked Implementation 
-	  
+	  /*
 	  protected SequenceFile.Writer setupNesting(Context context) throws IOException, InterruptedException{
 		  
 		  TaskAttemptID mapInput = context.getTaskAttemptID();
@@ -83,9 +84,41 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  return writer;
 		  
 	  }
+	  */
+	  
+	  protected void setupNesting(Context context) throws IOException, InterruptedException{
+		  
+		  TaskAttemptID mapInput = context.getTaskAttemptID();
+		  
+		  Configuration conf = context.getConfiguration();
+		  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
+		  Path path = new Path("/tmp/inceptions/" + mapInput.toString());
+		  SequenceFile.Writer writer = null;
+		  
+		  //LongWritable key = new LongWritable();
+		  //Text value = new Text();
+		  
+		  System.out.println(context.getMapOutputKeyClass());
+		  System.out.println(context.getMapOutputValueClass());
+		  
+		  
+		  try{
+			  writer = SequenceFile.createWriter(fs, conf, path, 
+					  	context.getMapOutputKeyClass(),
+					  	context.getMapOutputValueClass());	  
+
+			  while(context.nextKeyValue()){
+				  nestedMap(context.getCurrentKey(), context.getCurrentValue(), writer);
+			  }
+		  }finally{
+			  IOUtils.closeStream(writer);
+		  }
+ 
+	  }
+	  
 	  
 	  protected void nestedMap (KEYIN key, VALUEIN value, SequenceFile.Writer writer) throws IOException, InterruptedException{
-		  writer.append((KEYOUT) key, (VALUEOUT) value);
+		  writer.append((KEYIN) key, (VALUEIN) value);
 	  }
 	  
 	  protected void cleanupNesting(SequenceFile.Writer writer){
@@ -119,14 +152,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  public void run(Context context) throws IOException, InterruptedException {
 		    setup(context);
 		    
-		    SequenceFile.Writer writer= setupNesting(context);
-		    
-			    while(context.nextKeyValue()){
-			    	nestedMap(context.getCurrentKey(), context.getCurrentValue(), writer);
-			    }
-		    
-		    cleanupNesting(writer);
-		    
+		        setupNesting(context);
+
 		    	normalMap(context);
 		    
 		    cleanup(context);

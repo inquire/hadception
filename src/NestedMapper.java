@@ -7,6 +7,7 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import java.io.IOException;
 import java.net.URI;
 
+import org.apache.hadoop.mapred.join.InnerJoinRecordReader;
 import org.apache.hadoop.mapreduce.*;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -65,17 +66,71 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	   * and running the user supplied functions. 
 	   */
 	  
+	  // Hacked Implementation 
+	  
+	  protected SequenceFile.Writer setupNesting(Context context) throws IOException, InterruptedException{
+		  
+		  TaskAttemptID mapInput = context.getTaskAttemptID();
+		  
+		  Configuration conf = context.getConfiguration();
+		  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
+		  Path path = new Path("/tmp/inceptions/" + mapInput.toString());
+		  SequenceFile.Writer writer = null;
+		  
+		  writer = SequenceFile.createWriter(fs, conf, path, 
+					  						context.getCurrentKey().getClass(),
+					  						context.getCurrentValue().getClass());	  
+		  return writer;
+		  
+	  }
+	  
+	  protected void nestedMap (KEYIN key, VALUEIN value, SequenceFile.Writer writer) throws IOException, InterruptedException{
+		  writer.append((KEYOUT) key, (VALUEOUT) value);
+	  }
+	  
+	  protected void cleanupNesting(SequenceFile.Writer writer){
+		  IOUtils.closeStream(writer);
+	  }
+	  
+	  @SuppressWarnings("unchecked")
+	  protected void normalMap(Context context) throws IOException, InterruptedException{
+		  
+		  TaskAttemptID mapOutput = context.getTaskAttemptID();
+		  Configuration conf = context.getConfiguration();
+		  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapOutput.toString()), conf);
+		  Path path = new Path("/tmp/inceptions/" + mapOutput.toString());
+		  
+		  SequenceFile.Reader reader = null;
+		  
+		  try{
+			  reader = new SequenceFile.Reader(fs, path, conf);
+			  
+			  Writable key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
+			  Writable value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
+			  
+			  while(reader.next(key, value)){
+				  map((KEYIN) key, (VALUEIN) value, context);
+			  }
+		  }finally{
+			  IOUtils.closeStream(reader);
+		  }
+	  }
+	  
 	  public void run(Context context) throws IOException, InterruptedException {
 		    setup(context);
-		    while (context.nextKeyValue()) {
-		      map(context.getCurrentKey(), context.getCurrentValue(), context);
-		    }
+		    
+		    SequenceFile.Writer writer= setupNesting(context);
+		    
+			    while(context.nextKeyValue()){
+			    	nestedMap(context.getCurrentKey(), context.getCurrentValue(), writer);
+			    }
+		    
+		    cleanupNesting(writer);
+		    
+		    	normalMap(context);
+		    
 		    cleanup(context);
 		  }
-	  
-	  
-	  
-	
 	
 	
 	

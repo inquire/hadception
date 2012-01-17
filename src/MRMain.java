@@ -18,8 +18,8 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.GenericOptionsParser;
+ 
 
-  
 public class MRMain extends Configured implements Tool{
        
 public Path workingPath;
@@ -37,6 +37,11 @@ public Path workingPath;
             context.write(word, one);
         }
     }   
+    
+    public void nestedMap(LongWritable key , Text value, SequenceFile.Writer writer) throws IOException, InterruptedException{
+    	writer.append(key, value);
+    }
+    
  }    
     
     

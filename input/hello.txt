@@ -1,0 +1,3 @@
+Hello hadoop goodbye hadoop
+Hello world goodbye world
+Hello thinker goodbye thinker

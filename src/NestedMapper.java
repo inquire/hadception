@@ -122,13 +122,16 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  
 	  NestedWritersSF<KEYIN, VALUEIN> writer;
 	  @SuppressWarnings({"unchecked" })
-	protected void setupNesting(Context context) throws Exception{
+	protected void setupNestedMap(Context context) throws IOException, InterruptedException{
+	
 		  LongWritable key = new LongWritable();
 		  Text value = new Text();
 		  
-		  writer =  new NestedWritersSF<KEYIN, VALUEIN>(context, (KEYIN) key, (VALUEIN) value);
-		  //newWriter.nestedWrite(object, object2, writer)
-		 // newWriter.nestedWrite(object, object2, writer);
+		try {
+			writer =  new NestedWritersSF<KEYIN, VALUEIN>(context, (KEYIN) key, (VALUEIN) value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		  
 		  while(context.nextKeyValue()){
 			  nestedMap(context.getCurrentKey(), context.getCurrentValue());
@@ -138,21 +141,17 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  
 	  }
 	  
-	  
 	protected void nestedMap (KEYIN key, VALUEIN value) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 		  writer.write((KEYIN) key, (VALUEIN) value);
 	  }
 	
 	
-	//protected void   
-	  
-	  
-	  
 	  protected void cleanupNesting(SequenceFile.Writer writer){
 		  IOUtils.closeStream(writer);
 	  }
 	  
+	  /*
 	  @SuppressWarnings("unchecked")
 	  protected void normalMap(Context context) throws IOException, InterruptedException{
 		  
@@ -178,27 +177,33 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 			  IOUtils.closeStream(reader);
 		  }
 	  }
+	  */
+
+	  
+	  NestedReaderSF reader;
+	  @SuppressWarnings("unchecked")
+	protected void setupNormalMap(Context context) throws IOException, InterruptedException{
+		  reader = new NestedReaderSF(context);
+		  
+		  while (reader.next()){
+			  map((KEYIN) reader.getKey(), (VALUEIN) reader.getValue(), context);
+		  }
+		  
+	  }
+	  
 	  
 	  public void run(Context context) throws IOException, InterruptedException {
 		    setup(context);
-		    
-		        try {
-					setupNesting(context);
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
-		    	normalMap(context);
+		    	// TO DO setupVariables();
+		    
+				setupNestedMap(context);
+
+
+		    	setupNormalMap(context);
 		    
 		    cleanup(context);
-		  }
+	  }
 	
 	
 	

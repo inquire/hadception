@@ -38,10 +38,10 @@ public Path workingPath;
         }
     }   
     
-    public void nestedMap(LongWritable key , Text value, SequenceFile.Writer writer) throws IOException, InterruptedException{
+   /** public void nestedMap(LongWritable key , Text value, SequenceFile.Writer writer) throws IOException, InterruptedException{
     	writer.append(key, value);
     }
-    
+   **/ 
  }    
     
     

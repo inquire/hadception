@@ -65,6 +65,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  /**
 	   * Core of the mapper, section responsible for setting up the context
 	   * and running the user supplied functions. 
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	   */
 	  
 	  // Hacked Implementation 
@@ -86,6 +88,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  }
 	  */
 	  
+	  /*
 	  protected void setupNesting(Context context) throws IOException, InterruptedException{
 		  
 		  TaskAttemptID mapInput = context.getTaskAttemptID();
@@ -95,8 +98,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  Path path = new Path("/tmp/inceptions/" + mapInput.toString());
 		  SequenceFile.Writer writer = null;
 		  
-		  //LongWritable key = new LongWritable();
-		  //Text value = new Text();
+		  LongWritable key = new LongWritable();
+		  Text value = new Text();
 		  
 		  System.out.println(context.getMapOutputKeyClass());
 		  System.out.println(context.getMapOutputValueClass());
@@ -104,8 +107,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  
 		  try{
 			  writer = SequenceFile.createWriter(fs, conf, path, 
-					  	context.getMapOutputKeyClass(),
-					  	context.getMapOutputValueClass());	  
+					  	key.getClass(),
+					  	value.getClass());	  
 
 			  while(context.nextKeyValue()){
 				  nestedMap(context.getCurrentKey(), context.getCurrentValue(), writer);
@@ -115,11 +118,36 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  }
  
 	  }
+	  */
 	  
-	  
-	  protected void nestedMap (KEYIN key, VALUEIN value, SequenceFile.Writer writer) throws IOException, InterruptedException{
-		  writer.append((KEYIN) key, (VALUEIN) value);
+	  NestedWritersSF<KEYIN, VALUEIN> writer;
+	  @SuppressWarnings({"unchecked" })
+	protected void setupNesting(Context context) throws Exception{
+		  LongWritable key = new LongWritable();
+		  Text value = new Text();
+		  
+		  writer =  new NestedWritersSF<KEYIN, VALUEIN>(context, (KEYIN) key, (VALUEIN) value);
+		  //newWriter.nestedWrite(object, object2, writer)
+		 // newWriter.nestedWrite(object, object2, writer);
+		  
+		  while(context.nextKeyValue()){
+			  nestedMap(context.getCurrentKey(), context.getCurrentValue());
+		  }
+		  
+		  writer.close();
+		  
 	  }
+	  
+	  
+	protected void nestedMap (KEYIN key, VALUEIN value) throws IOException, InterruptedException{
+		System.out.println(key + " / " + value);
+		  writer.write((KEYIN) key, (VALUEIN) value);
+	  }
+	
+	
+	//protected void   
+	  
+	  
 	  
 	  protected void cleanupNesting(SequenceFile.Writer writer){
 		  IOUtils.closeStream(writer);
@@ -142,6 +170,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 			  Writable value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
 			  
 			  while(reader.next(key, value)){
+				
+				  System.out.println(key + " / " + value);
 				  map((KEYIN) key, (VALUEIN) value, context);
 			  }
 		  }finally{
@@ -152,7 +182,18 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  public void run(Context context) throws IOException, InterruptedException {
 		    setup(context);
 		    
-		        setupNesting(context);
+		        try {
+					setupNesting(context);
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 		    	normalMap(context);
 		    

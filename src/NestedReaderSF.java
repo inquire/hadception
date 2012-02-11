@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.util.ReflectionUtils;
 
 
-public class NestedReaderSF {
+public class NestedReaderSF implements CommonReaderUtils{
 
 	SequenceFile.Reader reader;
 	Writable key = null;
@@ -38,25 +38,23 @@ public class NestedReaderSF {
 		return reader;
 	}
 	
-	protected Writable getKey(){
+	public Writable getKey(){
  		return key;
 	}
 	
-	protected Writable getValue(){
+	public Writable getValue(){
 		return value;
 	}
 	
-	protected boolean next() throws IOException{
+	public boolean next() throws IOException{
 		if (reader.next(key, value)){
 			return true;
-		}
-		else{
+		}else{
 			return false;
 		}
 	}
 	
-	
-	protected void close(){
+	public void close() throws IOException{
 		IOUtils.closeStream(reader);
 	}
 	

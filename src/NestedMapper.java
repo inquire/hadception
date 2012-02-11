@@ -120,7 +120,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  }
 	  */
 	  
-	  NestedWritersSF<KEYIN, VALUEIN> writer;
+	  //NestedWriterSF<KEYIN, VALUEIN> writer;
+	  NestedWriterBF<KEYIN, VALUEIN> writer;
 	  @SuppressWarnings({"unchecked" })
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException{
 	
@@ -128,7 +129,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  Text value = new Text();
 		  
 		try {
-			writer =  new NestedWritersSF<KEYIN, VALUEIN>(context, (KEYIN) key, (VALUEIN) value);
+			writer =  new NestedWriterBF<KEYIN, VALUEIN>(context, (KEYIN) key, (VALUEIN) value);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -180,10 +181,10 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  */
 
 	  
-	  NestedReaderSF reader;
+	  NestedReaderBF reader;
 	  @SuppressWarnings("unchecked")
 	protected void setupNormalMap(Context context) throws IOException, InterruptedException{
-		  reader = new NestedReaderSF(context);
+		  reader = new NestedReaderBF(context);
 		  
 		  while (reader.next()){
 			  map((KEYIN) reader.getKey(), (VALUEIN) reader.getValue(), context);

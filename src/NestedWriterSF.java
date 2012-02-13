@@ -7,9 +7,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.hadoop.io.SequenceFile.Writer;
-import org.apache.hadoop.mapreduce.Mapper.Context;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+//import org.apache.hadoop.io.SequenceFile.Writer;
+
 
 /**
  * Implementation for a nested writer that uses a SequenceFile as output.
@@ -22,11 +21,49 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 public class NestedWriterSF<KEYIN, VALUEIN> implements CommonWriterUtils{
 
-	SequenceFile.Writer writer;
-	
+	SequenceFile.Writer writer = null;
+	Configuration conf;
+	FileSystem fs;
+	Path path;
 	
 	@SuppressWarnings({ "rawtypes"})
-	public NestedWriterSF(Context context, KEYIN key, VALUEIN value) throws Exception{
+	public NestedWriterSF(org.apache.hadoop.mapreduce.Mapper.Context context 
+			) throws Exception{
+	
+	  TaskAttemptID mapInput = context.getTaskAttemptID();  
+	  conf = context.getConfiguration();
+	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()),conf);
+	  path = new Path("/tmp/inceptions/" + mapInput.toString());
+  
+	}
+	
+	@SuppressWarnings({ "rawtypes"})
+	public NestedWriterSF(org.apache.hadoop.mapreduce.Reducer.Context context 
+			) throws Exception{
+	
+	  TaskAttemptID mapInput = context.getTaskAttemptID();  
+	  conf = context.getConfiguration();
+	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()),conf);
+	  path = new Path("/tmp/inceptions/" + mapInput.toString());
+  
+	}
+	
+
+	@SuppressWarnings({ "rawtypes"})
+	public NestedWriterSF(org.apache.hadoop.mapreduce.Mapper.Context context, 
+			KEYIN key, VALUEIN value) throws Exception{
+	
+	  TaskAttemptID mapInput = context.getTaskAttemptID();  
+	  conf = context.getConfiguration();
+	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()),conf);
+	  path = new Path("/tmp/inceptions/" + mapInput.toString());
+
+		    
+	}
+	
+	@SuppressWarnings({ "rawtypes"})
+	public NestedWriterSF(org.apache.hadoop.mapreduce.Reducer.Context context,
+			KEYIN key, VALUEIN value) throws Exception{
 	
 	  TaskAttemptID mapInput = context.getTaskAttemptID();  
 	  Configuration conf = context.getConfiguration();
@@ -47,8 +84,20 @@ public class NestedWriterSF<KEYIN, VALUEIN> implements CommonWriterUtils{
 	@Override
 	@SuppressWarnings("unchecked")
 	public void write (Object key, Object value) throws IOException{ 
-		writer.append((KEYIN) key, (VALUEIN) value);
+		if (writer == null){
+			writer = SequenceFile.createWriter(fs, conf, path, 
+				  	key.getClass(),value.getClass());
+			writer.append((KEYIN) key, (VALUEIN) value);
+		}else{
+			writer.append((KEYIN) key, (VALUEIN) value);
+		}
+		//writer.append((KEYIN) key, (VALUEIN) value);
 	}
+	
+	public Path getPath(){
+		return path;
+	}
+	
 	
 	/**
 	 * Method closing the stream that was used to write to the SequenceFile

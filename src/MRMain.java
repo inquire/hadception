@@ -10,14 +10,19 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.GenericOptionsParser;
+
+
  
 
 public class MRMain extends Configured implements Tool{
@@ -28,24 +33,62 @@ public Path workingPath;
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
 
+    
+    @Override
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
         StringTokenizer tokenizer = new StringTokenizer(line);
         
         while (tokenizer.hasMoreTokens()) {
-            word.set(tokenizer.nextToken());
+            word.set(tokenizer.nextToken().toUpperCase());
             context.write(word, one);
         }
-    }   
-    
-   /** public void nestedMap(LongWritable key , Text value, SequenceFile.Writer writer) throws IOException, InterruptedException{
-    	writer.append(key, value);
     }
-   **/ 
+    
+    @Override
+    protected boolean runNestedJob() throws IOException, InterruptedException{
+    	Configuration conf2 = new Configuration();
+        Job job2 = new Job(conf2, "Layer2");
+    	
+        job2.setOutputKeyClass(LongWritable.class); // modified here
+        job2.setOutputValueClass(Text.class);		// modified here
+        job2.setMapperClass(FinalMap.class);
+        job2.setInputFormatClass(SequenceFileInputFormat.class);
+        job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+        
+        FileInputFormat.addInputPath(job2, writer.getPath());
+        FileOutputFormat.setOutputPath(job2, new Path("/tmp/outputs/2"));
+
+        job2.setJarByClass(MRMain.class);
+        try{
+			System.out.println("before");
+        	job2.waitForCompletion(true);
+        }catch(ClassNotFoundException ex){
+        	System.out.println(ex);
+        }    	
+        
+        return true;
+    }
+    
+    @Override
+    protected void nestedMap (LongWritable key, Text value) throws IOException, InterruptedException{
+		System.out.println(key + " / " + value);
+		  writer.write(key, value);
+	  }
  }    
     
+ 
+ public static class FinalMap extends Mapper<LongWritable, Text, LongWritable, Text>{
+	 
+	 public void map (LongWritable key, Text value, Context context)
+			 throws IOException, InterruptedException{
+		 context.write(key, value);
+	 }
+	 
+ }
     
- public static class Reduce extends NestedReducer<Text, IntWritable, Text, IntWritable> {
+ public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
 
     public void reduce(Text key, Iterable<IntWritable> values, Context context) 
       throws IOException, InterruptedException {
@@ -53,7 +96,7 @@ public Path workingPath;
         for (IntWritable val : values) {
             sum += val.get();
         }
-        context.write(key, new IntWritable(sum));
+       context.write(key, new IntWritable(sum));
     }
  }
 
@@ -65,7 +108,7 @@ public Path workingPath;
  		job.setOutputValueClass(IntWritable.class);
 
  		job.setMapperClass(Map.class);
- 		job.setReducerClass(Reduce.class);
+ 		//job.setReducerClass(Reduce.class);
 
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);

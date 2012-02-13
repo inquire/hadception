@@ -30,8 +30,13 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
 
 
+
+
+
 public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
 
+	Class<?> myClass;
+	
 	  /**
 	   * Called once at the beginning of the task. 
 	   * It contains the: conf, taskid, reader, writer, commited, reporter, split.
@@ -70,121 +75,74 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	   */
 	  
 	  // Hacked Implementation 
-	  /*
-	  protected SequenceFile.Writer setupNesting(Context context) throws IOException, InterruptedException{
-		  
-		  TaskAttemptID mapInput = context.getTaskAttemptID();
-		  
-		  Configuration conf = context.getConfiguration();
-		  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
-		  Path path = new Path("/tmp/inceptions/" + mapInput.toString());
-		  SequenceFile.Writer writer = null;
-		  
-		  writer = SequenceFile.createWriter(fs, conf, path, 
-					  						context.getCurrentKey().getClass(),
-					  						context.getCurrentValue().getClass());	  
-		  return writer;
-		  
-	  }
-	  */
-	  
-	  /*
-	  protected void setupNesting(Context context) throws IOException, InterruptedException{
-		  
-		  TaskAttemptID mapInput = context.getTaskAttemptID();
-		  
-		  Configuration conf = context.getConfiguration();
-		  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
-		  Path path = new Path("/tmp/inceptions/" + mapInput.toString());
-		  SequenceFile.Writer writer = null;
-		  
-		  LongWritable key = new LongWritable();
-		  Text value = new Text();
-		  
-		  System.out.println(context.getMapOutputKeyClass());
-		  System.out.println(context.getMapOutputValueClass());
-		  
-		  
-		  try{
-			  writer = SequenceFile.createWriter(fs, conf, path, 
-					  	key.getClass(),
-					  	value.getClass());	  
 
-			  while(context.nextKeyValue()){
-				  nestedMap(context.getCurrentKey(), context.getCurrentValue(), writer);
-			  }
-		  }finally{
-			  IOUtils.closeStream(writer);
-		  }
- 
-	  }
-	  */
-	  
-	  //NestedWriterSF<KEYIN, VALUEIN> writer;
-	  NestedWriterBF<KEYIN, VALUEIN> writer;
-	  @SuppressWarnings({"unchecked" })
+
+	NestedWriterSF<KEYIN, VALUEIN> writer;
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException{
 	
-		  LongWritable key = new LongWritable();
-		  Text value = new Text();
-		  
 		try {
-			writer =  new NestedWriterBF<KEYIN, VALUEIN>(context, (KEYIN) key, (VALUEIN) value);
+			writer =  new NestedWriterSF<KEYIN, VALUEIN>(context);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	  
 		  
 		  while(context.nextKeyValue()){
 			  nestedMap(context.getCurrentKey(), context.getCurrentValue());
 		  }
 		  
 		  writer.close();
+		  while(runNestedJob() != true){
+			  // we wait;
+		  }
 		  
 	  }
-	  
+	// HACKED IMPLEMENTATION
+	/* 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected boolean nextMapSpecs() throws IOException, InterruptedException{
+    	
+    	Configuration conf2 = new Configuration();
+        Job job2 = new Job(conf2, "Layer2");
+    	
+        job2.setOutputKeyClass(LongWritable.class); // modify stuff
+        job2.setOutputValueClass(Text.class); // modify stuff
+        job2.setInputFormatClass(TextInputFormat.class);
+        job2.setOutputFormatClass(TextOutputFormat.class);
+
+        
+        FileInputFormat.addInputPath(job2, writer.getPath());
+        FileOutputFormat.setOutputPath(job2, new Path("/tmp/outputs/2"));
+
+        job2.setJarByClass(MRMain.class);
+        try{
+			System.out.println("before");
+        	job2.waitForCompletion(true);
+        }catch(ClassNotFoundException ex){
+        	System.out.println(ex);
+        }    	
+        
+        return true;
+    }
+	*/
+	
+	protected boolean runNestedJob() throws IOException, InterruptedException{
+		// Custom user implementation
+		return true;
+	}
+	
+	
 	protected void nestedMap (KEYIN key, VALUEIN value) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 		  writer.write((KEYIN) key, (VALUEIN) value);
-	  }
+	}
 	
-	
-	  protected void cleanupNesting(SequenceFile.Writer writer){
-		  IOUtils.closeStream(writer);
-	  }
-	  
-	  /*
-	  @SuppressWarnings("unchecked")
-	  protected void normalMap(Context context) throws IOException, InterruptedException{
-		  
-		  TaskAttemptID mapOutput = context.getTaskAttemptID();
-		  Configuration conf = context.getConfiguration();
-		  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapOutput.toString()), conf);
-		  Path path = new Path("/tmp/inceptions/" + mapOutput.toString());
-		  
-		  SequenceFile.Reader reader = null;
-		  
-		  try{
-			  reader = new SequenceFile.Reader(fs, path, conf);
-			  
-			  Writable key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
-			  Writable value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
-			  
-			  while(reader.next(key, value)){
-				
-				  System.out.println(key + " / " + value);
-				  map((KEYIN) key, (VALUEIN) value, context);
-			  }
-		  }finally{
-			  IOUtils.closeStream(reader);
-		  }
-	  }
-	  */
 
 	  
-	  NestedReaderBF reader;
+	  NestedReaderSF reader;
 	  @SuppressWarnings("unchecked")
 	protected void setupNormalMap(Context context) throws IOException, InterruptedException{
-		  reader = new NestedReaderBF(context);
+		  reader = new NestedReaderSF(context);
 		  
 		  while (reader.next()){
 			  map((KEYIN) reader.getKey(), (VALUEIN) reader.getValue(), context);
@@ -193,14 +151,18 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  }
 	  
 	  
+	protected void runJob(Class<?> map) throws IOException, InterruptedException{
+		NestedJobs newJob = new NestedJobs(map, writer.getPath(), new Path("/tmp/outputs/2/"));
+		newJob.run();
+	}
+	  
 	  public void run(Context context) throws IOException, InterruptedException {
 		    setup(context);
-
-		    	// TO DO setupVariables();
+		    
+		    	// TO DO setupVariables(); + defaults
 		    
 				setupNestedMap(context);
-
-
+				
 		    	setupNormalMap(context);
 		    
 		    cleanup(context);

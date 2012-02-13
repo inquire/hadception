@@ -35,10 +35,9 @@ echo "Creating the framework jar file..."
 echo "Compiling the classes into inception..."
 javac -Xlint -classpath $HADOOP_HOME/hadoop-core-0.20.204.0.jar:$HADOOP_HOME/lib/commons-cli-1.2.jar -d inception src/*.java
 
-
-
 echo "Creating primary jar file..." 
 jar cvf inception.jar -C inception .  
+
 
 #echo 'Erasing common jar from hdfs...'
 #hadoop fs -rmr /tmp/utils

@@ -30,7 +30,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();
-		fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
 		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		path = new Path("/tmp/outputs/2/part-r-00000");
 		reader = new SequenceFile.Reader(fs, path, conf);

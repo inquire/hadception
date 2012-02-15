@@ -31,9 +31,10 @@ import org.apache.hadoop.util.ReflectionUtils;
 
 
 
-public class NestedUtils <KEY, VALUE, CONTEXT> {
+public class Nesting <KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
 
-	
+	//private NestedWriterSF;
+	//private NestedWriterBF
 	
 	
 	

@@ -15,7 +15,7 @@ public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils{
 	String delimiter = " ";
 	
 	@SuppressWarnings("rawtypes")
-	public NestedWriterBF(org.apache.hadoop.mapreduce.Mapper.Context context, KEYIN key, VALUEIN value) throws Exception{
+	public NestedWriterBF(org.apache.hadoop.mapreduce.Mapper.Context context) throws Exception{
 		
 		TaskAttemptID mapInput = context.getTaskAttemptID();  
 		Configuration conf = context.getConfiguration();
@@ -26,7 +26,7 @@ public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils{
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public NestedWriterBF(org.apache.hadoop.mapreduce.Reducer.Context context, KEYIN key, VALUEIN value) throws Exception{
+	public NestedWriterBF(org.apache.hadoop.mapreduce.Reducer.Context context) throws Exception{
 		
 		TaskAttemptID mapInput = context.getTaskAttemptID();  
 		Configuration conf = context.getConfiguration();

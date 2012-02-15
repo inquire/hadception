@@ -45,30 +45,19 @@ public Path workingPath;
         }
     }
     
+    
     @Override
-    protected boolean runNestedJob() throws IOException, InterruptedException{
-    	Configuration conf2 = new Configuration();
-        Job job2 = new Job(conf2, "Layer2");
+    //@SuppressWarnings("unused")
+	protected void setupNesting(Job job2, Configuration conf) throws IOException{
+    	//job2 = new Job(conf, "Layer2");
     	
         job2.setOutputKeyClass(LongWritable.class); // modified here
         job2.setOutputValueClass(Text.class);		// modified here
         job2.setMapperClass(FinalMap.class);
         job2.setInputFormatClass(SequenceFileInputFormat.class);
         job2.setOutputFormatClass(SequenceFileOutputFormat.class);
-
-        
-        FileInputFormat.addInputPath(job2, writer.getPath());
-        FileOutputFormat.setOutputPath(job2, new Path("/tmp/outputs/2"));
-
-        job2.setJarByClass(MRMain.class);
-        try{
-			System.out.println("before");
-        	job2.waitForCompletion(true);
-        }catch(ClassNotFoundException ex){
-        	System.out.println(ex);
-        }    	
-        
-        return true;
+  
+    	
     }
     
     @Override
@@ -108,7 +97,7 @@ public Path workingPath;
  		job.setOutputValueClass(IntWritable.class);
 
  		job.setMapperClass(Map.class);
- 		//job.setReducerClass(Reduce.class);
+ 		job.setReducerClass(Reduce.class);
 
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);

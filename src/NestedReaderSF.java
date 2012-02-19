@@ -28,6 +28,8 @@ public class NestedReaderSF implements CommonReaderUtils{
 	public NestedReaderSF(org.apache.hadoop.mapreduce.Mapper.Context context) 
 			throws IOException{
 		
+		//FIXME automagically path allocation;
+		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();
 		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
@@ -43,6 +45,8 @@ public class NestedReaderSF implements CommonReaderUtils{
 	@SuppressWarnings("rawtypes")
 	public NestedReaderSF(org.apache.hadoop.mapreduce.Reducer.Context context) 
 			throws IOException{
+		
+		//FIXME automagically path allocation;
 		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();

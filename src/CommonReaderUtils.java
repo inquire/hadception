@@ -1,16 +1,21 @@
 import java.io.IOException;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
 
 
 public interface CommonReaderUtils {
-
-	public Writable getKey();
 	
-	public Writable getValue();
-
-	public boolean next() throws IOException;
+	// XXX add path allocations for reader at instantiation time
 	
-	public void close() throws IOException;
+	public  Writable getKey();
+	
+	public  Writable getValue();
+
+	public  boolean next() throws IOException;
+	
+	public  void close() throws IOException;
 	
 }

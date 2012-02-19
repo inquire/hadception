@@ -9,7 +9,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 //import org.apache.hadoop.mapreduce.Mapper.Context;
 
-public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils{
+public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils<KEYIN, VALUEIN>{
 
 	BufferedWriter writer;
 	String delimiter = " ";

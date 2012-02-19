@@ -19,7 +19,7 @@ import org.apache.hadoop.io.SequenceFile;
  * @param <VALUEIN> The class type of the value that gets serialized in the SequenceFile.
  */
 
-public class NestedWriterSF<KEYIN, VALUEIN> implements CommonWriterUtils{
+public class NestedWriterSF<KEYIN, VALUEIN> implements CommonWriterUtils<KEYIN, VALUEIN>{
 
 	SequenceFile.Writer writer = null;
 	Configuration conf;

@@ -19,6 +19,8 @@ public class NestedReaderBF implements CommonReaderUtils{
 	String [] keyValuePair;
 	String delimiter = " ";
 	
+	//XXX fix the variable instantiation (add reflection or something)
+	
 	LongWritable key = new LongWritable();
 	Text value = new Text();
 	
@@ -26,6 +28,8 @@ public class NestedReaderBF implements CommonReaderUtils{
 	
 	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException{
+		
+		//FIXME automagically path allocation
 		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();
@@ -40,6 +44,8 @@ public class NestedReaderBF implements CommonReaderUtils{
 	
 	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Reducer.Context context) throws IOException{
+		
+		//FIXME automagically path allocation
 		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();

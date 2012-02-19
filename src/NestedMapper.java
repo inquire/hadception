@@ -37,6 +37,9 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	
 	private Path nestedJobInputPath;
 	private Path nestedJobOutputPath;
+	
+	//FIXME automatic identifier of inner job working
+	
 	private String writerType = null;
 	private String readerType = null;
 	
@@ -122,15 +125,21 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		System.out.println(nestedJobInputPath);
 		System.out.println(nestedJobOutputPath);
 		
-		//if(SequenceFileInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
+		/**
+		if(SequenceFileInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
+			System.out.println("It's a sequence file man!!");
+		}
+		**/
+		
+		if(SequenceFileInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
     		SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
     		writerType = "SequenceFile";
-		//}
-    				
-		//if(SequenceFileOutputFormat.class.getClass() == nestedJob.getOutputFormatClass().getClass()){
+		}
+    	
+		if(SequenceFileOutputFormat.class.getClass() == nestedJob.getOutputFormatClass().getClass()){
     		SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
     		readerType = "SequenceFile";
-		//}
+		}
 		
 		if(TextInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
 			FileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
@@ -150,13 +159,18 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		
 		return true;
 	}
-	  
- 
-	CommonWriterUtils writer;
-	protected void setupNestedMap(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+	
+	//TODO : document writerFactory
+	
+	WriterFactory<KEYIN, VALUEIN> writerFactory = new WriterFactory<KEYIN, VALUEIN>();
+	CommonWriterUtils<KEYIN, VALUEIN> writer;
+	
+	@SuppressWarnings("unchecked")
+	protected void setupNestedMap(Context context) throws IOException, InterruptedException, 
+		ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
-			writer =  new NestedWriterSF<KEYIN, VALUEIN>(context);
+			writer =  writerFactory.makeWriter(context, "SequenceFile");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -173,11 +187,23 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	    	// we busy wait for the nested job to finalize;
 	    }
 	  }
-
-	  CommonReaderUtils reader;
-	  @SuppressWarnings("unchecked")
+	
+	//TODO: document readerFactory;
+	
+	ReaderFactory readerFactory = new ReaderFactory();
+	CommonReaderUtils reader;
+	
+	@SuppressWarnings("unchecked")
 	protected void setupNormalMap(Context context) throws IOException, InterruptedException{
-		  reader = new NestedReaderSF(context);
+		
+		  try {
+			reader = readerFactory.makeReader(context, "SequenceFile");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		  
+		  //TODO Type check incoming key values and spread the checking throughout the reader interface
 		  
 		  while (reader.next()){
 			  map((KEYIN) reader.getKey(), (VALUEIN) reader.getValue(), context);

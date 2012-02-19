@@ -92,8 +92,6 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 
 		}  
 	  
-	  
-
 		protected void setupWorkflow() throws IOException{
 			// TODO Auto-generated method stub
 	    	
@@ -153,12 +151,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		return true;
 	}
 	  
-	  
-	 
+ 
 	CommonWriterUtils writer;
-
-
-
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
@@ -178,16 +172,9 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	    while(executeNestedJob() != true){
 	    	// we busy wait for the nested job to finalize;
 	    }
-	    
-		  
 	  }
 
-	
-	
-	
-
-	  
-	  NestedReaderSF reader;
+	  CommonReaderUtils reader;
 	  @SuppressWarnings("unchecked")
 	protected void setupNormalMap(Context context) throws IOException, InterruptedException{
 		  reader = new NestedReaderSF(context);
@@ -197,7 +184,6 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		  }
 		  
 	  }
-	  
 	  
 	  /**
 	  protected void runJob(Class<?> map) throws IOException, InterruptedException{

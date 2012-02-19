@@ -25,6 +25,8 @@ public class NestedReaderBF implements CommonReaderUtils{
 	Text value = new Text();
 	
 	Configuration conf;
+	FileSystem fs;
+	Path path;
 	
 	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException{
@@ -33,24 +35,28 @@ public class NestedReaderBF implements CommonReaderUtils{
 		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();
-		FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
-		Path path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		//fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf); 
+		path = new Path("/tmp/outputs/2/part-r-00000");
 		reader = new BufferedReader(new InputStreamReader(fs.open(path)));
 		//key = (Text) ReflectionUtils.newInstance(Text.class, conf);
 		//value = (Text) ReflectionUtils.newInstance(Text.class, conf);
 		
 	}
 	
+	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
+	
 	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Reducer.Context context) throws IOException{
 		
 		//FIXME automagically path allocation
-		
+	
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();
-		FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
-		Path path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
+		path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		
 		reader = new BufferedReader(new InputStreamReader(fs.open(path)));
 		//key = (Text) ReflectionUtils.newInstance(Text.class, conf);
@@ -101,8 +107,16 @@ public class NestedReaderBF implements CommonReaderUtils{
 		this.delimiter = delimiter;
 	}
 	
+	@Override
+	public Path getPath() {
+		// TODO Auto-generated method stub
+		return path;
+	}
+	
 	public void close() throws IOException{
 		reader.close();
 	}
+
+
 	
 }

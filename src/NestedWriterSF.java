@@ -66,9 +66,9 @@ public class NestedWriterSF<KEYIN, VALUEIN> implements CommonWriterUtils<KEYIN, 
 			KEYIN key, VALUEIN value) throws Exception{
 	
 	  TaskAttemptID mapInput = context.getTaskAttemptID();  
-	  Configuration conf = context.getConfiguration();
-	  FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
-	  Path path = new Path("/tmp/inceptions/" + mapInput.toString());
+	  conf = context.getConfiguration();
+	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
+	  path = new Path("/tmp/inceptions/" + mapInput.toString());
 
 	writer = SequenceFile.createWriter(fs, conf, path, 
 				  	key.getClass(),value.getClass());	    

@@ -60,16 +60,22 @@ public Path workingPath;
         job2.setOutputValueClass(Text.class);		// modified here
      
         job2.setMapperClass(FinalMap.class);
-        job2.setInputFormatClass(SequenceFileInputFormat.class);
-        job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+        //job2.setInputFormatClass(SequenceFileInputFormat.class);
+        //job2.setOutputFormatClass(SequenceFileOutputFormat.class);
   
+        job2.setInputFormatClass(TextInputFormat.class);
+        job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+        
+        FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+        
+        
     	
     }
     
     @Override
     protected void nestedMap (LongWritable key, Text value) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
-		  writer.write(key, value);
+		  writer.write(value, "");
 	  }
  }    
     
@@ -78,6 +84,8 @@ public Path workingPath;
 	 
 	 public void map (LongWritable key, Text value, Context context)
 			 throws IOException, InterruptedException{
+		 
+		 System.out.println("Stuff is going on here: " + key.toString() + " / " + value.toString());
 		 context.write(key, value);
 	 }
 	 
@@ -107,6 +115,7 @@ public Path workingPath;
 
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);
+ 		
  		
  		FileInputFormat.setInputPaths(job, new Path(args[0]));
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));

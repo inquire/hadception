@@ -6,7 +6,9 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 
 import java.net.URI;
 
+import org.apache.hadoop.mapred.MultiFileInputFormat;
 import org.apache.hadoop.mapred.join.InnerJoinRecordReader;
+import org.apache.hadoop.mapred.lib.MultipleInputs;
 import org.apache.hadoop.mapreduce.*;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -130,7 +132,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 			System.out.println("It's a sequence file man!!");
 		}
 		**/
-		
+				
 		if(SequenceFileInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
     		SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
     		writerType = "SequenceFile";
@@ -141,6 +143,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
     		readerType = "SequenceFile";
 		}
 		
+		
 		if(TextInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
 			FileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
 			writerType = "BufferFile";
@@ -150,6 +153,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
 			readerType = "BufferFile";
 		}
+		
+		
 		
 		try{
 			nestedJob.waitForCompletion(true);
@@ -170,7 +175,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
-			writer =  writerFactory.makeWriter(context, "SequenceFile");
+			writer =  writerFactory.makeWriter(context, "BufferFile");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

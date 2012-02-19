@@ -12,15 +12,19 @@ import org.apache.hadoop.fs.Path;
 public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils<KEYIN, VALUEIN>{
 
 	BufferedWriter writer;
+	Configuration conf;
+	FileSystem fs;
+	Path path;
+	
 	String delimiter = " ";
 	
 	@SuppressWarnings("rawtypes")
 	public NestedWriterBF(org.apache.hadoop.mapreduce.Mapper.Context context) throws Exception{
 		
 		TaskAttemptID mapInput = context.getTaskAttemptID();  
-		Configuration conf = context.getConfiguration();
-		FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
-		Path path = new Path("/tmp/inceptions/" + mapInput.toString());
+		conf = context.getConfiguration();
+		fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
+		path = new Path("/tmp/inceptions/" + mapInput.toString());
 		
 		writer = new BufferedWriter(new OutputStreamWriter(fs.create(path,true)));
 	}
@@ -29,9 +33,9 @@ public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils<KEYIN, 
 	public NestedWriterBF(org.apache.hadoop.mapreduce.Reducer.Context context) throws Exception{
 		
 		TaskAttemptID mapInput = context.getTaskAttemptID();  
-		Configuration conf = context.getConfiguration();
-		FileSystem fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
-		Path path = new Path("/tmp/inceptions/" + mapInput.toString());
+		conf = context.getConfiguration();
+		fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()), conf);
+		path = new Path("/tmp/inceptions/" + mapInput.toString());
 		
 		writer = new BufferedWriter(new OutputStreamWriter(fs.create(path,true)));
 	}
@@ -53,7 +57,7 @@ public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils<KEYIN, 
 	@Override
 	public Path getPath() {
 		// TODO Auto-generated method stub
-		return null;
+		return path;
 	}
 	
 	@Override

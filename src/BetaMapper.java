@@ -108,12 +108,15 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		}
 		
 	}
-	CommonWriterUtils writer;
+	
+	WriterFactory<KEYIN, VALUEIN> writerFactory = new WriterFactory<KEYIN, VALUEIN>();
+	CommonWriterUtils<KEYIN,VALUEIN> writer;
 
+	@SuppressWarnings("unchecked")
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
-			writer =  new NestedWriterSF<KEYIN, VALUEIN>(context);
+			writer =  writerFactory.makeWriter(context, writerType);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

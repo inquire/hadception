@@ -42,6 +42,8 @@ public class NestedReaderSF implements CommonReaderUtils{
 		  
 	}
 	
+	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
+	
 	@SuppressWarnings("rawtypes")
 	public NestedReaderSF(org.apache.hadoop.mapreduce.Reducer.Context context) 
 			throws IOException{

@@ -16,6 +16,8 @@ public interface CommonReaderUtils {
 
 	public  boolean next() throws IOException;
 	
+	public Path getPath();
+	
 	public  void close() throws IOException;
 	
 }

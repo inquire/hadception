@@ -42,12 +42,6 @@ public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils{
 		writer.write(key.toString() + delimiter + value.toString() + "\n");
 	}
 
-	@Override
-	public void close() throws IOException {
-		// TODO Auto-generated method stub
-		writer.close();
-	}
-	
 	/**
 	 * Setting a delimiter when writing buffers to HDFS
 	 * @param delimiter The type of delimiter necessary between 
@@ -55,6 +49,16 @@ public class NestedWriterBF<KEYIN, VALUEIN> implements CommonWriterUtils{
 	public void setDelimiter(String delimiter){
 		this.delimiter = delimiter;
 	}
+
+	@Override
+	public Path getPath() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
-	
+	@Override
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+		writer.close();
+	}
 }

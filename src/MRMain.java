@@ -34,6 +34,9 @@ public Path workingPath;
     private Text word = new Text();
 
     
+    //TODO implementing case switch for triggering a nested job with 
+    // different mappers and reducers
+    
     @Override
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
@@ -46,6 +49,8 @@ public Path workingPath;
     }
     
     
+    // TODO adding switch for various job types
+    
     @Override
     //@SuppressWarnings("unused")
 	protected void setupNesting(Job job2, Configuration conf) throws IOException{
@@ -53,6 +58,7 @@ public Path workingPath;
     	
         job2.setOutputKeyClass(LongWritable.class); // modified here
         job2.setOutputValueClass(Text.class);		// modified here
+     
         job2.setMapperClass(FinalMap.class);
         job2.setInputFormatClass(SequenceFileInputFormat.class);
         job2.setOutputFormatClass(SequenceFileOutputFormat.class);

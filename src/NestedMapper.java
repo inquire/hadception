@@ -35,8 +35,10 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	Configuration conf = new Configuration(); 
 	Job nestedJob;
 	
-	Path nestedJobInputPath;
-	Path nestedJobOutputPath;
+	private Path nestedJobInputPath;
+	private Path nestedJobOutputPath;
+	private String writerType = null;
+	private String readerType = null;
 	
 	
 	  /**
@@ -47,6 +49,13 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  protected void setup(Context context
               ) throws IOException, InterruptedException {
 		  // NOTHING
+	  }
+	  
+
+	  protected void nestedMap (KEYIN key, VALUEIN value) throws IOException, InterruptedException{
+		System.out.println(key + " / " + value);
+	
+		writer.write((KEYIN) key, (VALUEIN) value);
 	  }
 	  
 	  /** 
@@ -103,6 +112,8 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 
 		}
 
+	// TODO Generate Comment and Testing Cases	
+		
 	protected boolean executeNestedJob() 
 			throws IOException, ClassNotFoundException, InstantiationException, 
 								IllegalAccessException, InterruptedException{
@@ -110,20 +121,27 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		nestedJobInputPath = writer.getPath();
 		nestedJobOutputPath = new Path("/tmp/outputs/2");
 		
-		//if(SequenceFileInputFormat.class.isInstance(nestedJob.getInputFormatClass())){
-    		SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
-    	//}
+		System.out.println(nestedJobInputPath);
+		System.out.println(nestedJobOutputPath);
 		
-		//if(SequenceFileOutputFormat.class.isInstance(nestedJob.getOutputFormatClass())){
+		//if(SequenceFileInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
+    		SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
+    		writerType = "SequenceFile";
+		//}
+    				
+		//if(SequenceFileOutputFormat.class.getClass() == nestedJob.getOutputFormatClass().getClass()){
     		SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+    		readerType = "SequenceFile";
 		//}
 		
-		if(nestedJob.getInputFormatClass().isInstance(TextInputFormat.class.newInstance())){
+		if(TextInputFormat.class.getClass() == nestedJob.getInputFormatClass().getClass()){
 			FileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
+			writerType = "BufferFile";
 		}
 		
-		if(nestedJob.getInputFormatClass().isInstance(TextOutputFormat.class.newInstance())){
-			FileOutputFormat.setOutputPath(nestedJob, nestedJobInputPath);
+		if(TextOutputFormat.class.getClass() == nestedJob.getOutputFormatClass().getClass()){
+			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+			readerType = "BufferFile";
 		}
 		
 		try{
@@ -136,8 +154,10 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	}
 	  
 	  
-	  
-	NestedWriterSF<KEYIN, VALUEIN> writer;
+	 
+	CommonWriterUtils writer;
+
+
 
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 
@@ -161,11 +181,9 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	    
 		  
 	  }
+
 	
-	protected void nestedMap (KEYIN key, VALUEIN value) throws IOException, InterruptedException{
-		System.out.println(key + " / " + value);
-		  writer.write((KEYIN) key, (VALUEIN) value);
-	}
+	
 	
 
 	  

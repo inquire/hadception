@@ -167,15 +167,15 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	
 	//TODO : document writerFactory
 	
-	WriterFactory<KEYIN, VALUEIN> writerFactory = new WriterFactory<KEYIN, VALUEIN>();
-	CommonWriterUtils<KEYIN, VALUEIN> writer;
+	WriterFactory writerFactory = new WriterFactory();
+	CommonWriterUtils writer;
 	
 	@SuppressWarnings("unchecked")
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, 
 		ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
-			writer =  writerFactory.makeWriter(context, "BufferFile");
+			writer =  writerFactory.makeWriter(context, "SequenceFile");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

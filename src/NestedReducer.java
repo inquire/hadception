@@ -70,11 +70,11 @@ public class NestedReducer<KEYIN,VALUEIN,KEYOUT,VALUEOUT> extends Reducer<KEYIN,
     // NOTHING
   }
 
-  NestedWriterSF<KEYIN, VALUEIN> writer;
+  NestedWriterSF writer;
   private void setupNestedReducer(Context context) throws IOException, InterruptedException {
   
 	try {
-		writer =  new NestedWriterSF<KEYIN, VALUEIN>(context);
+		writer =  new NestedWriterSF(context);
 	} catch (Exception e) {
 		e.printStackTrace();
 	}

@@ -37,6 +37,11 @@ public Path workingPath;
     //TODO implementing case switch for triggering a nested job with 
     // different mappers and reducers
     
+   // @Override 
+   // protected void setWorkingDirectory(String path){
+   // 	path = "/tmp/";
+   // }
+    
     @Override
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
@@ -53,29 +58,28 @@ public Path workingPath;
     
     @Override
     //@SuppressWarnings("unused")
-	protected void setupNesting(Job job2, Configuration conf, String string) throws IOException{
+	protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
     	//job2 = new Job(conf, "Layer2");
     	
         job2.setOutputKeyClass(LongWritable.class); // modified here
         job2.setOutputValueClass(Text.class);		// modified here
      
         job2.setMapperClass(FinalMap.class);
-        //job2.setInputFormatClass(SequenceFileInputFormat.class);
-        //job2.setOutputFormatClass(SequenceFileOutputFormat.class);
   
         job2.setInputFormatClass(TextInputFormat.class);
         job2.setOutputFormatClass(SequenceFileOutputFormat.class);
         
-        FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
-        
+        if (condition == null){
+        //	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+        }
         
     	
     }
     
     @Override
-    protected void nestedMap (LongWritable key, Text value) throws IOException, InterruptedException{
+    protected void nestedMap (LongWritable key, Text value, String condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
-		  writer.write(value, "");
+		  writer.write(key, value);
 	  }
  }    
     

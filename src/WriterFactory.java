@@ -1,21 +1,60 @@
+import org.apache.hadoop.fs.Path;
+
 
 // TODO Add Factory Description
 
-public class WriterFactory<KEYIN, VALUEIN> {
+public class WriterFactory {
 	
 	// TODO add makeWriter details (when running it from a Map task)
 	
+	// ==================== Factories for development with fixed path =============================
+	
 	@SuppressWarnings("rawtypes")
-	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Mapper.Context context,
+	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Mapper.Context context, 
 			String writerType) throws Exception{
-
-		if (writerType == "SequenceFile"){
-			return new NestedWriterSF<KEYIN, VALUEIN>(context);
+		
+		if(writerType == "SequenceFile"){
+			return new NestedWriterSF(context);
 		}
 		
-		if (writerType == "BufferFile"){
-			return new NestedWriterBF<KEYIN, VALUEIN>(context);
+		if(writerType == "BufferFile"){
+			return new NestedWriterBF(context);
 		}
+		
+		return null;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Reducer.Context context,
+			String writerType) throws Exception{
+		
+		if(writerType == "SequenceFile"){
+			return new NestedWriterSF(context);
+		}
+		
+		if(writerType == "BufferFile"){
+			return new NestedWriterBF(context);
+		}
+		
+		return null;
+	}
+	
+	// ========================= Factories with custom writer path ================================
+	
+	@SuppressWarnings("rawtypes")
+	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Mapper.Context context, 
+			Path innerWorks, String jobName, String writerType) throws Exception{
+
+		if (writerType == "SequenceFile"){
+			System.out.println("i'm here");
+			return new NestedWriterSF(context, innerWorks, jobName);
+		}
+		
+		
+		if (writerType == "BufferFile"){
+			return new NestedWriterBF(context, innerWorks, jobName);
+		}
+		
 		
 		return null;
 	}
@@ -24,17 +63,20 @@ public class WriterFactory<KEYIN, VALUEIN> {
 	
 	@SuppressWarnings("rawtypes")
 	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Reducer.Context context,
-			String writerType) throws Exception{
+			Path innerWorks, String jobName, String writerType) throws Exception{
 		
 		if (writerType == "SequenceFile"){
-			return new NestedWriterSF<KEYIN, VALUEIN>(context);
+			return new NestedWriterSF(context, innerWorks, jobName);
 		}
 		
 		if (writerType == "BufferFile"){
-			return new NestedWriterBF<KEYIN, VALUEIN>(context);
+			return new NestedWriterBF(context, innerWorks, jobName);
 		}
 		
 		return null;
 	}
 
+	// ============================================================================================
+
+	
 }

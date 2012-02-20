@@ -14,10 +14,10 @@ import org.apache.hadoop.util.ReflectionUtils;
 public class NestedReaderSF implements CommonReaderUtils{
 
 	SequenceFile.Reader reader;
-	
 	Configuration conf;
 	FileSystem fs;
 	Path path;
+	String uniqueID;
 	
 	Writable key = null;
 	Writable value = null;
@@ -35,12 +35,46 @@ public class NestedReaderSF implements CommonReaderUtils{
 		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
 		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		path = new Path("/tmp/outputs/2/part-r-00000");
+		
 		reader = new SequenceFile.Reader(fs, path, conf);
 		
 		key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
 		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
 		  
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public NestedReaderSF(org.apache.hadoop.mapreduce.Mapper.Context context, 
+			Path innerWorks, String jobName) 
+			throws IOException{
+		
+		//FIXME automagically path allocation;
+		
+		conf = context.getConfiguration();
+		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		
+		/*
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		path = new Path("/tmp/outputs/2/part-r-00000");
+		*/
+		
+		uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString();
+		
+		reader = new SequenceFile.Reader(fs, path, conf);
+		
+		key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
+		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
+		  
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
 	
@@ -52,7 +86,8 @@ public class NestedReaderSF implements CommonReaderUtils{
 		
 		conf = context.getConfiguration();
 		TaskAttemptID sequenceOut = context.getTaskAttemptID();
-		fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		
 		reader = new SequenceFile.Reader(fs, path, conf);
@@ -61,6 +96,11 @@ public class NestedReaderSF implements CommonReaderUtils{
 		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
 		  
 	}
+	
+	
+	
+	
+	
 	
 	
 	protected SequenceFile.Reader getReader(){

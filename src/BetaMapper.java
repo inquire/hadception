@@ -2,12 +2,13 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
+//import org.apache.hadoop.io.SequenceFile;
+//import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import org.apache.hadoop.mapreduce.Mapper.Context;
+//import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -62,6 +63,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		System.out.println(innerWorks);
 		
 		nestedJob = new Job(conf);
+		
 		setupNestedJob(nestedJob, conf, condition);
 		
 		// TODO implement an uniform naming scheme
@@ -105,9 +107,11 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 							IllegalAccessException, InterruptedException{
 		
 		//nestedJobInputPath = writer.getPath();
-		nestedJobInputPath = new Path("/tmp/inceptions/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
+		nestedJobInputPath = new Path(innerWorks + "/inceptions/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
 		//nestedJobInputPath = new Path("/tmp/outputs/1");
-		nestedJobOutputPath = new Path("/tmp/outputs/2");
+		//nestedJobOutputPath = new Path("/tmp/outputs/2");
+		nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+		
 		
 		//SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
 		//SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
@@ -137,7 +141,6 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 	}
 	
-	@SuppressWarnings({ "unchecked" })
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
@@ -170,6 +173,8 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	
 	protected boolean executeNestedJob(){
 		
+		
+		
 	try{
 		nestedJob.waitForCompletion(true);
 	} catch (IOException e) {
@@ -185,7 +190,6 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void setupNormalMap(Context context) throws IOException, InterruptedException {
 		
 		try{
@@ -196,14 +200,13 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		}
 		
 		while(reader.next()){
-			map((KEYIN) reader.getKey(), (VALUEIN)reader.getValue(), context);
+			map(reader.getKey(), reader.getValue(), context);
 		}
 		
 	}
 	
-	@Override
 	@SuppressWarnings("unchecked")
-	protected void map(KEYIN key, VALUEIN value, Context context) throws IOException, InterruptedException{
+	protected void map(Writable key, Writable value, Context context) throws IOException, InterruptedException{
 		context.write((KEYOUT) key, (VALUEOUT) value);
 	}
 	

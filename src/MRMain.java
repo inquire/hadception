@@ -29,7 +29,7 @@ public class MRMain extends Configured implements Tool{
        
 public Path workingPath;
 	
- public static class Map extends NestedMapper<LongWritable, Text, Text, IntWritable> {
+ public static class Map extends BetaMapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
 
@@ -53,7 +53,7 @@ public Path workingPath;
     
     @Override
     //@SuppressWarnings("unused")
-	protected void setupNesting(Job job2, Configuration conf) throws IOException{
+	protected void setupNesting(Job job2, Configuration conf, String string) throws IOException{
     	//job2 = new Job(conf, "Layer2");
     	
         job2.setOutputKeyClass(LongWritable.class); // modified here

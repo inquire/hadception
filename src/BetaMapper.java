@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -27,8 +28,10 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	Path innerWorks = new Path("/tmp/");
 	
 	String writerType = null;
-	String readerType = null;
+	String readerType = "SequenceFile";
 	String condition = null;
+	
+	String nestedLevel = null;
 	
 	WriterFactory writerFactory = new WriterFactory();
 	CommonWriterUtils writer;
@@ -62,16 +65,20 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		System.out.println(innerWorks);
 		
+		//conf.set("hadoop.job.ugi", context.getConfiguration().getResource("hadoop.job.ugi").toString());
+		
 		nestedJob = new Job(conf);
 		
 		setupNestedJob(nestedJob, conf, condition);
 		
 		// TODO implement an uniform naming scheme
-		nestedJob.setJobName("Layer-2");
+		//nestedJob.setJobName("Layer-2");
 		
 			setupInternalWR(context);
 		
-		condition = "something";
+		nestedLevel = nestedJob.getJobName();	
+			
+		//condition = "something";
 
 		// Implement Condition thing;	
 		setupNestedMap(context);
@@ -80,7 +87,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		setupNesting(nestedJob, conf, condition);
 		
-		while(executeNestedJob() != true){
+		while(executeNestedJob(context) != true){
 			// busy wait until nesting is completed
 		}
 		
@@ -110,7 +117,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		nestedJobInputPath = new Path(innerWorks + "/inceptions/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
 		//nestedJobInputPath = new Path("/tmp/outputs/1");
 		//nestedJobOutputPath = new Path("/tmp/outputs/2");
-		nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+		//nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
 		
 		
 		//SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
@@ -122,10 +129,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
     		writerType = "SequenceFile";
 		}
     				
-		if(SequenceFileOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
-    		SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
-    		readerType = "SequenceFile";
-		}
+
 		
 		
 		if(TextInputFormat.class.getName() == nestedJob.getInputFormatClass().getName()){
@@ -145,7 +149,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 
 		try {
 			System.out.println("In the writer and the type is : " + writerType);
-			writer = writerFactory.makeWriter(context, innerWorks, nestedJob.getJobName(), writerType);
+			writer = writerFactory.makeWriter(context, innerWorks, nestedLevel, writerType);
 			//writer = new NestedWriterSF<KEYIN, VALUEIN>(context, innerWorks, nestedJob.getJobName());
 			//writer = writerFactory.makeWriter(context, writerType);
 		} catch (Exception e) {
@@ -171,21 +175,36 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		writer.write(key, value);
 	}
 	
-	protected boolean executeNestedJob(){
+	protected boolean executeNestedJob(Context context) throws ClassNotFoundException{
 		
 		
+	if (condition != null){	
 		
-	try{
-		nestedJob.waitForCompletion(true);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (ClassNotFoundException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+
+		if(SequenceFileOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
+    		SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+    		readerType = "SequenceFile";
+		}
+		
+		if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
+			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+			readerType = "BufferFile";
+		}
+		
+		
+		try{
+			nestedJob.waitForCompletion(true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 		return true;
 	}
@@ -194,7 +213,11 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		try{
 			System.out.println("In the reader and the reader is of type: " + readerType);
-			reader = readerFactory.makeReader(context, readerType);
+			//reader = readerFactory.makeReader(context, readerType);
+			
+			System.out.println("Condition is :  " + condition);
+			
+			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);
 		}catch (Exception ex){
 			ex.printStackTrace();
 		}
@@ -207,6 +230,9 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	
 	@SuppressWarnings("unchecked")
 	protected void map(Writable key, Writable value, Context context) throws IOException, InterruptedException{
+		
+		System.out.println(key.getClass().getName() +" / "+ value.getClass().getName());
+		
 		context.write((KEYOUT) key, (VALUEOUT) value);
 	}
 	

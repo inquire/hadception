@@ -44,30 +44,35 @@ public class ReaderFactory {
 	
 	@SuppressWarnings("rawtypes")
 	public CommonReaderUtils makeReader (org.apache.hadoop.mapreduce.Mapper.Context context, 
-			Path innerWorks, String jobName, String readerType) throws Exception{
+			Path innerWorks, String jobName, String readerType, String condition) throws Exception{
 		
 		if (readerType == "SequenceFile"){
-			return new NestedReaderSF(context ,innerWorks, jobName);
+			return new NestedReaderSF(context ,innerWorks, jobName, condition);
 		}
 		
+		/*
 		if (readerType == "BufferFile"){
 			return new NestedReaderBF(context, innerWorks, jobName);
 		}
+		*/
 		
 		return null;
 	}
 	
 	@SuppressWarnings("rawtypes")
 	public CommonReaderUtils makeReader (org.apache.hadoop.mapreduce.Reducer.Context context, 
-			Path innerWorks, String jobName, String readerType) throws Exception{
+			Path innerWorks, String jobName, String readerType, String condition) throws Exception{
 		
 		if (readerType == "SequenceFile"){
-			return new NestedReaderSF(context ,innerWorks, jobName);
+			return new NestedReaderSF(context ,innerWorks, jobName, condition);
 		}
 		
+		
+		/*
 		if (readerType == "BufferFile"){
 			return new NestedReaderBF(context, innerWorks, jobName);
 		}
+		*/
 		
 		return null;
 	}

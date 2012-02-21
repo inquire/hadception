@@ -45,7 +45,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 	
 	@SuppressWarnings("rawtypes")
 	public NestedReaderSF(org.apache.hadoop.mapreduce.Mapper.Context context, 
-			Path innerWorks, String jobName) 
+			Path innerWorks, String jobName, String condition) 
 			throws IOException{
 		
 		//FIXME automagically path allocation;
@@ -58,8 +58,15 @@ public class NestedReaderSF implements CommonReaderUtils{
 		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		path = new Path("/tmp/outputs/2/part-r-00000");
 		*/
+		if (condition != null){ 
+			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
+		}else{
+			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
+
+		}
+		fs = FileSystem.get(URI.create(uniqueID),conf);
+		path = new Path(uniqueID);
 		
-		uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString();
 		
 		reader = new SequenceFile.Reader(fs, path, conf);
 		
@@ -67,14 +74,6 @@ public class NestedReaderSF implements CommonReaderUtils{
 		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
 		  
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
 	
@@ -97,7 +96,38 @@ public class NestedReaderSF implements CommonReaderUtils{
 		  
 	}
 	
-	
+	@SuppressWarnings("rawtypes")
+	public NestedReaderSF(org.apache.hadoop.mapreduce.Reducer.Context context,
+			Path innerWorks, String jobName, String condition) throws IOException{
+		
+		//FIXME automagically path allocation;
+		
+		conf = context.getConfiguration();
+		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		
+		/*
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		*/
+		
+		System.out.println(condition);
+		
+		if(condition != null){
+			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
+		}else{
+			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
+		}
+		fs = FileSystem.get(URI.create(uniqueID),conf);
+		path = new Path(uniqueID);
+		
+		
+		reader = new SequenceFile.Reader(fs, path, conf);
+		
+		key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
+		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
+		  
+	}
 	
 	
 	

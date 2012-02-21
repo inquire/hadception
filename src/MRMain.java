@@ -43,8 +43,11 @@ public Path workingPath;
    // }
     
     @Override
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        String line = value.toString();
+    public void map(Writable key, Writable value, Context context) throws IOException, InterruptedException {
+        
+    	System.out.println(key +" / "+ value);
+    	
+    	String line = value.toString();
         StringTokenizer tokenizer = new StringTokenizer(line);
         
         while (tokenizer.hasMoreTokens()) {
@@ -60,18 +63,23 @@ public Path workingPath;
     //@SuppressWarnings("unused")
 	protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
     	//job2 = new Job(conf, "Layer2");
+    
+    	job2.setJobName("Layer-2-Mapper-No");
     	
         job2.setOutputKeyClass(LongWritable.class); // modified here
         job2.setOutputValueClass(Text.class);		// modified here
      
         job2.setMapperClass(FinalMap.class);
   
-        job2.setInputFormatClass(TextInputFormat.class);
+        job2.setInputFormatClass(SequenceFileInputFormat.class);
         job2.setOutputFormatClass(SequenceFileOutputFormat.class);
         
-        if (condition == null){
+        if (condition != "something"){
         //	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+            job2.setJobName("Layer-2-Mapper-Yes");
         }
+        
+  
         
     	
     }

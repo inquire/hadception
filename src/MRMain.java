@@ -42,6 +42,7 @@ public Path workingPath;
    // 	path = "/tmp/";
    // }
     
+    
     @Override
     public void map(Writable key, Writable value, Context context) throws IOException, InterruptedException {
         
@@ -69,19 +70,16 @@ public Path workingPath;
         job2.setOutputKeyClass(LongWritable.class); // modified here
         job2.setOutputValueClass(Text.class);		// modified here
      
-        job2.setMapperClass(FinalMap.class);
+        job2.setMapperClass(FinalMapM.class);
   
         job2.setInputFormatClass(SequenceFileInputFormat.class);
         job2.setOutputFormatClass(SequenceFileOutputFormat.class);
         
-        if (condition != "something"){
+        if (condition != "somethin]g"){
         //	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
             job2.setJobName("Layer-2-Mapper-Yes");
         }
-        
-  
-        
-    	
+
     }
     
     @Override
@@ -92,7 +90,7 @@ public Path workingPath;
  }    
     
  
- public static class FinalMap extends Mapper<LongWritable, Text, LongWritable, Text>{
+ public static class FinalMapM extends Mapper<LongWritable, Text, LongWritable, Text>{
 	 
 	 public void map (LongWritable key, Text value, Context context)
 			 throws IOException, InterruptedException{
@@ -103,17 +101,64 @@ public Path workingPath;
 	 
  }
     
- public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+ public static class Reduce extends BetaReducer<Text, IntWritable, Text, IntWritable> {
 
-    public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+	 @Override
+	 protected void nestedReducer(Text key, Iterable<IntWritable> values, String condition)
+	 	throws IOException, InterruptedException{
+		 
+		 int sum = 0;
+	        for (IntWritable val : values) {
+	            sum += val.get();
+	        }
+	       writer.write(key, new IntWritable(sum));
+		 
+	 }
+	 
+	 
+	 @Override
+	 //@SuppressWarnings("unused")
+	 protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
+		 //job2 = new Job(conf, "Layer2");
+
+		 job2.setJobName("Layer-2-Reducer-No");
+
+		 job2.setOutputKeyClass(Text.class); // modified here
+		 job2.setOutputValueClass(IntWritable.class);		// modified here
+
+		 job2.setMapperClass(FinalMapR.class);
+
+		 job2.setInputFormatClass(SequenceFileInputFormat.class);
+		 job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+		 if (condition != "somethin]g"){
+			 //	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+			 job2.setJobName("Layer-2-Reducer-Yes");
+		 }
+
+	 } 
+	 
+	/** 
+	@Override 
+    protected void reduce(Writable key, Writable value, Context context) 
       throws IOException, InterruptedException {
-        int sum = 0;
-        for (IntWritable val : values) {
-            sum += val.get();
-        }
-       context.write(key, new IntWritable(sum));
+      
+       context.write((KEYOUT)key, (VALUEOUT)value);
     }
+  	*/
  }
+ 
+ public static class FinalMapR extends Mapper<Text, IntWritable, Text, IntWritable>{
+	 
+	 public void map (Text key, IntWritable value, Context context)
+			 throws IOException, InterruptedException{
+		 
+		 System.out.println("Stuff is going on here: " + key.toString() + " / " + value.toString());
+		 context.write(key, value);
+	 }
+	 
+ }
+ 
 
  	public int run(String[] args) throws Exception {
 

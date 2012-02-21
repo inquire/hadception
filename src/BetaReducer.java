@@ -26,8 +26,10 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	Path innerWorks = new Path("/tmp/");
 	
 	String writerType = null;
-	String readerType = null;
+	String readerType = "SequenceFile";
 	String condition = null;
+	
+	String nestedLevel = null;
 	
 	WriterFactory writerFactory = new WriterFactory();
 	CommonWriterUtils writer;
@@ -67,10 +69,12 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		setupNestedJob(nestedJob, conf, condition);
 		
 		// TODO implement an uniform naming scheme
-		nestedJob.setJobName("Layer-2");
+		//nestedJob.setJobName("Layer-2");
 		
 			setupInternalWR(context);
 		
+		nestedLevel = nestedJob.getJobName();	
+			
 		condition = "something";
 
 		// Implement Condition thing;	
@@ -80,7 +84,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		
 		setupNesting(nestedJob, conf, condition);
 		
-		while(executeNestedJob() != true){
+		while(executeNestedJob(context) != true){
 			// busy wait until nesting is completed
 		}
 		
@@ -106,7 +110,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		nestedJobInputPath = new Path(innerWorks + "/inceptions/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
 		//nestedJobInputPath = new Path("/tmp/outputs/1");
 		//nestedJobOutputPath = new Path("/tmp/outputs/2");
-		nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+		//nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
 
 
 		//SequenceFileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
@@ -118,16 +122,21 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 			writerType = "SequenceFile";
 		}
 
+		/*
 		if(SequenceFileOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
 			SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
 			readerType = "SequenceFile";
 		}
-
+		*/
 
 		if(TextInputFormat.class.getName() == nestedJob.getInputFormatClass().getName()){
 			FileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
 			writerType = "BufferFile";
 		}
+		
+		//FIXME either fix or remove bufered output all together 
+		// !! - will crash if called because nestedJobOutputPath has been moved to executeNestedJob 
+		//      as to put the job type output somewhere
 
 		if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
 			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
@@ -161,14 +170,34 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	 //   }
 	}
 	
-	protected void nestedReducer (KEYIN key, Iterable<VALUEIN> value, String condition) throws IOException, InterruptedException{
-		System.out.println(key + " / " + value);
+	protected void nestedReducer (KEYIN key, Iterable<VALUEIN> values, String condition) throws IOException, InterruptedException{
+		System.out.println(key + " / " + values);
 	
-		writer.write(key, value);
+		for (VALUEIN val : values){
+			writer.write(key, val);
+		}
+		
 	}
 	
-	protected boolean executeNestedJob(){
+	protected boolean executeNestedJob(Context context) throws ClassNotFoundException{
 	
+		// TODO - maybe change condition to something else (ex: anything but null)
+		if (condition != null){
+			
+			nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+
+			if(SequenceFileOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
+				SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+				readerType = "SequenceFile";
+			}
+
+			//FIXME either fix or remove buffered output all together 
+
+			if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
+				FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+				readerType = "BufferFile";
+			}
+			
 			try{
 				nestedJob.waitForCompletion(true);
 			} catch (IOException e) {
@@ -181,7 +210,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
+		}
 		return true;
 	}
 	
@@ -190,6 +219,9 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		try{
 			System.out.println("In the reader and the reader is of type: " + readerType);
 			//reader = readerFactory.makeReader(context, readerType);
+			
+			System.out.println("Condition is :  " + condition);
+			
 			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);
 		}catch (Exception ex){
 			ex.printStackTrace();
@@ -203,6 +235,8 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	
 	@SuppressWarnings("unchecked")
 	protected void reduce(Writable key, Writable value, Context context) throws IOException, InterruptedException{
+		
+		System.out.println(key.getClass().getName() +" / "+ value.getClass().getName());
 		
 		context.write((KEYOUT) key, (VALUEOUT) value);
 	}

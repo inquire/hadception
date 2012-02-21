@@ -35,7 +35,6 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	
 	WriterFactory writerFactory = new WriterFactory();
 	CommonWriterUtils writer;
-	//NestedWriterSF<KEYIN, VALUEIN> writer;
 	
 	ReaderFactory readerFactory = new ReaderFactory();
 	CommonReaderUtils reader;
@@ -67,6 +66,9 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		//conf.set("hadoop.job.ugi", context.getConfiguration().getResource("hadoop.job.ugi").toString());
 		
+		
+		//System.out.println("Fuck knows what i'm looking for: " + );
+		
 		nestedJob = new Job(conf);
 		
 		setupNestedJob(nestedJob, conf, condition);
@@ -78,7 +80,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		nestedLevel = nestedJob.getJobName();	
 			
-		//condition = "something";
+		condition = "something";
 
 		// Implement Condition thing;	
 		setupNestedMap(context);
@@ -129,19 +131,13 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
     		writerType = "SequenceFile";
 		}
     				
-
-		
-		
 		if(TextInputFormat.class.getName() == nestedJob.getInputFormatClass().getName()){
 			FileInputFormat.addInputPath(nestedJob, nestedJobInputPath);
 			writerType = "BufferFile";
 		}
 		
-		if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
-			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
-			readerType = "BufferFile";
-		}
 		
+		//FIXME either fix or remove bufered output all together 
 		
 	}
 	
@@ -177,35 +173,37 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	
 	protected boolean executeNestedJob(Context context) throws ClassNotFoundException{
 		
-		
-	if (condition != null){	
-		
-		nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+		// TODO - maybe change condition to something else (ex: anything but null)
+		if (condition != null){	
 
-		if(SequenceFileOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
-    		SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
-    		readerType = "SequenceFile";
+			nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
+
+			if(SequenceFileOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
+				SequenceFileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+				readerType = "SequenceFile";
+			}
+
+			//FIXME either fix or remove buffered output all together 
+
+			if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
+				FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
+				readerType = "BufferFile";
+			}
+
+
+			try{
+				nestedJob.waitForCompletion(true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		
-		if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
-			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
-			readerType = "BufferFile";
-		}
-		
-		
-		try{
-			nestedJob.waitForCompletion(true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 		return true;
 	}
 	

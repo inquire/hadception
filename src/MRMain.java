@@ -72,11 +72,11 @@ public Path workingPath;
      
         job2.setMapperClass(FinalMapM.class);
   
-        job2.setInputFormatClass(SequenceFileInputFormat.class);
+        job2.setInputFormatClass(TextInputFormat.class);
         job2.setOutputFormatClass(SequenceFileOutputFormat.class);
         
-        if (condition != "somethin]g"){
-        //	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+        if (condition == "something"){
+        	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
             job2.setJobName("Layer-2-Mapper-Yes");
         }
 
@@ -85,7 +85,7 @@ public Path workingPath;
     @Override
     protected void nestedMap (LongWritable key, Text value, String condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
-		  writer.write(key, value);
+		  writer.write(value, " ");
 	  }
  }    
     

@@ -80,12 +80,16 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		nestedLevel = nestedJob.getJobName();	
 			
-		condition = "something";
+		//condition = "something";
 
 		// Implement Condition thing;	
 		setupNestedMap(context);
 			
+		//
+		
 		setupNestedJob(nestedJob,conf, condition);
+		
+		condition = "something";
 		
 		setupNesting(nestedJob, conf, condition);
 		

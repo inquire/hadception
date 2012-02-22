@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
 //import org.apache.hadoop.io.SequenceFile;
@@ -97,7 +99,12 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 			// busy wait until nesting is completed
 		}
 		
-		setupNormalMap(context);
+		try {
+			setupNormalMap(context);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -211,22 +218,63 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		return true;
 	}
 	
-	private void setupNormalMap(Context context) throws IOException, InterruptedException {
+	private void setupNormalMap(Context context) throws Exception {
 		
-		try{
-			System.out.println("In the reader and the reader is of type: " + readerType);
-			//reader = readerFactory.makeReader(context, readerType);
+		//try{
+		System.out.println("In the reader and the reader is of type: " + readerType);
+		//reader = readerFactory.makeReader(context, readerType);
+		
+		System.out.println("Condition is :  " + condition);
+		
+		if (condition != null){
+			//reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);	
 			
-			System.out.println("Condition is :  " + condition);
+			FileSystem fs = FileSystem.get(conf);
+			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString() + "/");
+			FileStatus[]stats = fs.listStatus(dir);
+			String checker = innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString() + "/" + "part-r-";
+			
+			for(FileStatus stat : stats){
+				//System.out.println(context.getTaskAttemptID().toString());
+				//System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
+				
+				if(stat.getPath().toUri().getPath().toString().contains(checker)){
+					System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
+					reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, condition);
+					
+					while(reader.next()){
+						map(reader.getKey(), reader.getValue(), context);
+					}	
+				}
+
+			}
+
+		}	
+		else{
 			
 			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);
-		}catch (Exception ex){
-			ex.printStackTrace();
+			
+			FileSystem fs = FileSystem.get(conf);
+			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + " / " + context.getTaskAttemptID().toString());
+			FileStatus[]stats = fs.listStatus(dir);
+			
+			for(FileStatus stat : stats){
+				System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath());
+			}
+			
+			while(reader.next()){
+				map(reader.getKey(), reader.getValue(), context);
+			}
+			
 		}
 		
-		while(reader.next()){
-			map(reader.getKey(), reader.getValue(), context);
-		}
+//	}catch (Exception ex){
+	//	ex.printStackTrace();
+//	}
+
+//	while(reader.next()){
+	//	reduce(reader.getKey(), reader.getValue(), context);
+//	}
 		
 	}
 	

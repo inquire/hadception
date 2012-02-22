@@ -60,7 +60,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	  protected void nestedMap (KEYIN key, VALUEIN value) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 	
-		writer.write((KEYIN) key, (VALUEIN) value);
+		writer.write(key, value);
 	  }
 	  
 	  /** 

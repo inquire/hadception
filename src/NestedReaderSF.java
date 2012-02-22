@@ -130,6 +130,74 @@ public class NestedReaderSF implements CommonReaderUtils{
 	}
 	
 	
+	// ====================== Alternative =================================
+	
+	@SuppressWarnings("rawtypes")
+	public NestedReaderSF(org.apache.hadoop.mapreduce.Mapper.Context context, 
+			String agreggatePath, String condition) 
+			throws IOException{
+		
+		//FIXME automagically path allocation;
+		
+		conf = context.getConfiguration();
+		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		
+		/*
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		path = new Path("/tmp/outputs/2/part-r-00000");
+		*/
+		if (condition != null){ 
+			//uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
+			uniqueID = agreggatePath;
+		}else{
+			//uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
+
+		}
+		fs = FileSystem.get(URI.create(uniqueID),conf);
+		path = new Path(uniqueID);
+		
+		reader = new SequenceFile.Reader(fs, path, conf);
+		
+		key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
+		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
+		
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public NestedReaderSF(org.apache.hadoop.mapreduce.Reducer.Context context, 
+			String agreggatePath, String condition) 
+			throws IOException{
+		
+		//FIXME automagically path allocation;
+		
+		conf = context.getConfiguration();
+		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		
+		/*
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		path = new Path("/tmp/outputs/2/part-r-00000");
+		*/
+		if (condition != null){ 
+			//uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
+			uniqueID = agreggatePath;
+		}else{
+			//uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
+
+		}
+		fs = FileSystem.get(URI.create(uniqueID),conf);
+		path = new Path(uniqueID);
+		
+		reader = new SequenceFile.Reader(fs, path, conf);
+		
+		key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
+		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
+		
+	}
+	
+	
+	
 	
 	
 	

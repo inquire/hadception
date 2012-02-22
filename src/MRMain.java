@@ -67,6 +67,8 @@ public Path workingPath;
     
     	job2.setJobName("Layer-2-Mapper-No");
     	
+    	job2.setNumReduceTasks(1);
+    	
         job2.setOutputKeyClass(LongWritable.class); // modified here
         job2.setOutputValueClass(Text.class);		// modified here
      
@@ -86,12 +88,30 @@ public Path workingPath;
     protected void nestedMap (LongWritable key, Text value, String condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 		  writer.write(value, " ");
+		  condition = "something";
 	  }
  }    
     
  
  public static class FinalMapM extends Mapper<LongWritable, Text, LongWritable, Text>{
+	 //  private final static IntWritable one = new IntWritable(1);
+	 //  private Text word = new Text();
 	 
+	 /*
+	   @Override
+	    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+	        
+	    	System.out.println(key +" / "+ value);
+	    	
+	    	String line = value.toString();
+	        StringTokenizer tokenizer = new StringTokenizer(line);
+	        
+	        while (tokenizer.hasMoreTokens()) {
+	            word.set(tokenizer.nextToken().toUpperCase());
+	            context.write(word, one);
+	        }
+	    }
+	 */
 	 public void map (LongWritable key, Text value, Context context)
 			 throws IOException, InterruptedException{
 		 

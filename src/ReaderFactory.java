@@ -5,7 +5,35 @@ public class ReaderFactory {
 
 	// TODO add makeReader details (when running it from a Map task)
 	
+	//======================== Factories aggregate reader files in reducers =======================
+	
+	
+	@SuppressWarnings("rawtypes")
+	public CommonReaderUtils makeReader(org.apache.hadoop.mapreduce.Mapper.Context context, 
+			String agreggatePath, String readerType, String condition) throws Exception{
+		
+		if(readerType == "SequenceFile"){
+			return new NestedReaderSF(context, agreggatePath, condition);
+		}
+		
+		return null;
+		
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public CommonReaderUtils makeReader(org.apache.hadoop.mapreduce.Reducer.Context context, 
+			String agreggatePath, String readerType, String condition) throws Exception{
+		
+		if(readerType == "SequenceFile"){
+			return new NestedReaderSF(context, agreggatePath, condition);
+		}
+		
+		return null;
+		
+	}
 
+	
+	
 	//========================== Factories for development with fixed path ========================
 	
 	@SuppressWarnings("rawtypes")

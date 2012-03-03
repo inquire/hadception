@@ -33,15 +33,37 @@ public Path workingPath;
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
 
+   
+		@Override
+    protected void nestedMap (LongWritable key, Text value, String condition) throws IOException, InterruptedException{
+		System.out.println(key + " / " + value);
+		  writer.write(value, " ");
+		  condition = "something";
+	  }
     
-    //TODO implementing case switch for triggering a nested job with 
-    // different mappers and reducers
-    
-   // @Override 
-   // protected void setWorkingDirectory(String path){
-   // 	path = "/tmp/";
-   // }
-    
+		@Override
+	    //@SuppressWarnings("unused")
+		protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
+	    //job2 = new Job(conf, "Layer2");
+
+    	job2.setJobName("Layer-2-Mapper-No");
+
+    	job2.setNumReduceTasks(1);
+
+      job2.setOutputKeyClass(LongWritable.class); // modified here
+      job2.setOutputValueClass(Text.class);		// modified here
+
+      job2.setMapperClass(FinalMapM.class);
+
+      job2.setInputFormatClass(TextInputFormat.class);
+      job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+      if (condition == "something"){
+      	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+          job2.setJobName("Layer-2-Mapper-Yes");
+      }
+		}
+
     
     @Override
     public void map(Writable key, Writable value, Context context) throws IOException, InterruptedException {
@@ -56,40 +78,6 @@ public Path workingPath;
             context.write(word, one);
         }
     }
-    
-    
-    // TODO adding switch for various job types
-    
-    @Override
-    //@SuppressWarnings("unused")
-	protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
-    	//job2 = new Job(conf, "Layer2");
-    
-    	job2.setJobName("Layer-2-Mapper-No");
-    	
-    	job2.setNumReduceTasks(1);
-    	
-        job2.setOutputKeyClass(LongWritable.class); // modified here
-        job2.setOutputValueClass(Text.class);		// modified here
-     
-        job2.setMapperClass(FinalMapM.class);
-  
-        job2.setInputFormatClass(TextInputFormat.class);
-        job2.setOutputFormatClass(SequenceFileOutputFormat.class);
-        
-        if (condition == "something"){
-        	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
-            job2.setJobName("Layer-2-Mapper-Yes");
-        }
-
-    }
-    
-    @Override
-    protected void nestedMap (LongWritable key, Text value, String condition) throws IOException, InterruptedException{
-		System.out.println(key + " / " + value);
-		  writer.write(value, " ");
-		  condition = "something";
-	  }
  }    
     
  

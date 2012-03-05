@@ -27,7 +27,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	Path nestedJobInputPath;
 	Path nestedJobOutputPath;
 	
-	Path innerWorks = new Path("/tmp/");
+	Path innerWorks;
 	
 	String writerType = null;
 	String readerType = "SequenceFile";
@@ -44,6 +44,8 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	// TODO Add commented structure
 	@Override
 	public void run(Context context) throws IOException, InterruptedException{
+		
+		context.getWorkingDirectory();
 		
 		setup(context);
 			try {
@@ -64,7 +66,9 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	// TODO Add commented structure
 	private void setupWorkflow(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		
-		System.out.println(innerWorks);
+		innerWorks = FileOutputFormat.getOutputPath(context).getParent();
+		
+		//System.out.println("Stuff: " + innerWorks);
 		
 		//conf.set("hadoop.job.ugi", context.getConfiguration().getResource("hadoop.job.ugi").toString());
 		
@@ -127,7 +131,9 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 							IllegalAccessException, InterruptedException{
 		
 		//nestedJobInputPath = writer.getPath();
+		
 		nestedJobInputPath = new Path(innerWorks + "/inceptions/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
+		System.out.println(nestedJobInputPath);
 		//nestedJobInputPath = new Path("/tmp/outputs/1");
 		//nestedJobOutputPath = new Path("/tmp/outputs/2");
 		//nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());

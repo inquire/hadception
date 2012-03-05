@@ -25,7 +25,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	Path nestedJobInputPath;
 	Path nestedJobOutputPath;
 	
-	Path innerWorks = new Path("/tmp/");
+	Path innerWorks;
 	
 	String writerType = null;
 	String readerType = "SequenceFile";
@@ -40,7 +40,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	CommonReaderUtils reader;
 	
 	//TODO Add commented structure
-	
+	@Override
 	public void run(Context context) throws IOException, InterruptedException{
 		
 		setup(context);
@@ -61,8 +61,10 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	
 	// TODO Add commented structure
 	private void setupWorkflow(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+	
+		innerWorks = FileOutputFormat.getOutputPath(context).getParent();
 		
-		System.out.println(innerWorks);
+		//System.out.println(innerWorks);
 		
 		//conf.set("hadoop.job.ugi", context.getConfiguration().getResource("hadoop.job.ugi").toString());
 	

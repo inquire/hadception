@@ -31,7 +31,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	
 	String writerType = null;
 	String readerType = "SequenceFile";
-	String condition = null;
+	JobTrigger jobTrigger = new JobTrigger();
 	
 	String nestedLevel = null;
 	
@@ -77,10 +77,13 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		
 		nestedJob = new Job(conf);
 		
-		setupNestedJob(nestedJob, conf, condition);
+		setupNestedJob(nestedJob, conf, jobTrigger);
 		
 		// TODO implement an uniform naming scheme
 		//nestedJob.setJobName("Layer-2");
+		
+    	System.out.println("==>> " + jobTrigger.getCondition());
+
 		
 			setupInternalWR(context);
 		
@@ -93,11 +96,11 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 			
 		//
 		
-		setupNestedJob(nestedJob,conf, condition);
+		setupNestedJob(nestedJob,conf, jobTrigger);
 		
-		condition = "something";
+		//condition = "something";
 		
-		setupNesting(nestedJob, conf, condition);
+		setupNesting(nestedJob, conf, jobTrigger);
 		
 		while(executeNestedJob(context) != true){
 			// busy wait until nesting is completed
@@ -114,12 +117,12 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	
 	
 	// TODO Add commented structure
-	protected void setupNestedJob(Job job, Configuration conf, String condition) throws IOException{
+	protected void setupNestedJob(Job job, Configuration conf, JobTrigger condition) throws IOException{
 		setupNesting(nestedJob, conf, condition);
 	}
 	
 	// TODO Add commented structure
-	protected void setupNesting(Job job, Configuration conf, String condition ) throws IOException{
+	protected void setupNesting(Job job, Configuration conf, JobTrigger condition ) throws IOException{
 		// User provided details for nested job configuration
 	}
 	
@@ -170,7 +173,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		}
 		  
 		  while(context.nextKeyValue()){
-			  nestedMap(context.getCurrentKey(), context.getCurrentValue(), condition);
+			  nestedMap(context.getCurrentKey(), context.getCurrentValue(), jobTrigger);
 		  }
 		  
 	    writer.close();
@@ -182,7 +185,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	 //   }
 	}
 	
-	protected void nestedMap (KEYIN key, VALUEIN value, String condition) throws IOException, InterruptedException{
+	protected void nestedMap (KEYIN key, VALUEIN value, JobTrigger condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 	
 		writer.write(key, value);
@@ -191,7 +194,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	protected boolean executeNestedJob(Context context) throws ClassNotFoundException{
 		
 		// TODO - maybe change condition to something else (ex: anything but null)
-		if (condition != null){	
+		if (jobTrigger.getCondition() != "default"){	
 
 			nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
 
@@ -230,9 +233,9 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		System.out.println("In the reader and the reader is of type: " + readerType);
 		//reader = readerFactory.makeReader(context, readerType);
 		
-		System.out.println("Condition is :  " + condition);
+		System.out.println("Condition is :  " + jobTrigger.getCondition());
 		
-		if (condition != null){
+		if (jobTrigger.getCondition() != "default"){
 			//reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);	
 			
 			FileSystem fs = FileSystem.get(conf);
@@ -246,7 +249,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 				
 				if(stat.getPath().toUri().getPath().toString().contains(checker)){
 					System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
-					reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, condition);
+					reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, jobTrigger.getCondition());
 					
 					while(reader.next()){
 						map(reader.getKey(), reader.getValue(), context);
@@ -258,7 +261,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		}	
 		else{
 			
-			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);
+			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, jobTrigger.getCondition());
 			
 			FileSystem fs = FileSystem.get(conf);
 			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + " / " + context.getTaskAttemptID().toString());

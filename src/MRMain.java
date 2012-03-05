@@ -34,35 +34,36 @@ public Path workingPath;
     private Text word = new Text();
 
    
-		@Override
-    protected void nestedMap (LongWritable key, Text value, String condition) throws IOException, InterruptedException{
+	@Override
+    protected void nestedMap (LongWritable key, Text value, JobTrigger condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 		  writer.write(value, " ");
-		  condition = "something";
+		  condition.setCondition("something");
 	  }
     
-		@Override
-	    //@SuppressWarnings("unused")
-		protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
+	@Override
+	//@SuppressWarnings("unused")
+	protected void setupNesting(Job job2, Configuration conf, JobTrigger condition) throws IOException{
 	    //job2 = new Job(conf, "Layer2");
 
     	job2.setJobName("Layer-2-Mapper-No");
 
     	job2.setNumReduceTasks(1);
 
-      job2.setOutputKeyClass(LongWritable.class); // modified here
-      job2.setOutputValueClass(Text.class);		// modified here
+    	job2.setOutputKeyClass(LongWritable.class); // modified here
+    	job2.setOutputValueClass(Text.class);		// modified here
 
-      job2.setMapperClass(FinalMapM.class);
+    	job2.setMapperClass(FinalMapM.class);
 
-      job2.setInputFormatClass(TextInputFormat.class);
-      job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+    	job2.setInputFormatClass(TextInputFormat.class);
+    	job2.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-      if (condition == "something"){
-      	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
-          job2.setJobName("Layer-2-Mapper-Yes");
-      }
-		}
+    	
+    	if (condition.getCondition().equals("something")){
+    		//FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
+    		job2.setJobName("Layer-2-Mapper-Yes");
+    	}
+	}
 
     
     @Override
@@ -112,7 +113,7 @@ public Path workingPath;
  public static class Reduce extends BetaReducer<Text, IntWritable, Text, IntWritable> {
 
 	 @Override
-	 protected void nestedReducer(Text key, Iterable<IntWritable> values, String condition)
+	 protected void nestedReducer(Text key, Iterable<IntWritable> values, JobTrigger condition)
 	 	throws IOException, InterruptedException{
 		 
 		 int sum = 0;
@@ -126,7 +127,7 @@ public Path workingPath;
 	 
 	 @Override
 	 //@SuppressWarnings("unused")
-	 protected void setupNesting(Job job2, Configuration conf, String condition) throws IOException{
+	 protected void setupNesting(Job job2, Configuration conf, JobTrigger condition) throws IOException{
 		 //job2 = new Job(conf, "Layer2");
 
 		 job2.setJobName("Layer-2-Reducer-No");
@@ -139,7 +140,7 @@ public Path workingPath;
 		 job2.setInputFormatClass(SequenceFileInputFormat.class);
 		 job2.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		 if (condition != "somethin]g"){
+		 if (jobTrigger.getCondition().equals("something")){
 			 //	FileInputFormat.addInputPath(job2, new Path("/tmp/nesten"));
 			 job2.setJobName("Layer-2-Reducer-Yes");
 		 }

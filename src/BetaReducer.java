@@ -29,7 +29,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	
 	String writerType = null;
 	String readerType = "SequenceFile";
-	String condition = null;
+	JobTrigger jobTrigger = new JobTrigger();
 	
 	String nestedLevel = null;
 	
@@ -72,7 +72,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		nestedJob = new Job(conf);
 		
 		
-		setupNestedJob(nestedJob, conf, condition);
+		setupNestedJob(nestedJob, conf, jobTrigger);
 		
 		// TODO implement an uniform naming scheme
 		//nestedJob.setJobName("Layer-2");
@@ -81,14 +81,14 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		
 		nestedLevel = nestedJob.getJobName();	
 			
-		condition = "something";
+		//condition = "something";
 
 		// Implement Condition thing;	
 		setupNestedReducer(context);
 			
-		setupNestedJob(nestedJob,conf, condition);
+		setupNestedJob(nestedJob,conf, jobTrigger);
 		
-		setupNesting(nestedJob, conf, condition);
+		setupNesting(nestedJob, conf, jobTrigger);
 		
 		while(executeNestedJob(context) != true){
 			// busy wait until nesting is completed
@@ -104,12 +104,12 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	}
 	
 	// TODO Add commented structure
-	protected void setupNestedJob(Job job, Configuration conf, String condition) throws IOException{
+	protected void setupNestedJob(Job job, Configuration conf, JobTrigger condition) throws IOException{
 		setupNesting(nestedJob, conf, condition);
 	}
 	
 	// TODO Add commented structure
-	protected void setupNesting(Job job, Configuration conf, String condition ) throws IOException{
+	protected void setupNesting(Job job, Configuration conf, JobTrigger condition ) throws IOException{
 		// User provided details for nested job configuration
 	}
 	
@@ -169,7 +169,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		}
 		  
 		  while(context.nextKeyValue()){
-			  nestedReducer(context.getCurrentKey(), context.getValues(), condition);
+			  nestedReducer(context.getCurrentKey(), context.getValues(), jobTrigger);
 		  }
 		  
 	    writer.close();
@@ -181,7 +181,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	 //   }
 	}
 	
-	protected void nestedReducer (KEYIN key, Iterable<VALUEIN> values, String condition) throws IOException, InterruptedException{
+	protected void nestedReducer (KEYIN key, Iterable<VALUEIN> values, JobTrigger jobTrigger ) throws IOException, InterruptedException{
 		System.out.println(key + " / " + values);
 	
 		for (VALUEIN val : values){
@@ -193,7 +193,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 	protected boolean executeNestedJob(Context context) throws ClassNotFoundException{
 	
 		// TODO - maybe change condition to something else (ex: anything but null)
-		if (condition != null){
+		if (jobTrigger.getCondition() != "default"){
 			
 			nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
 
@@ -231,9 +231,9 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 			System.out.println("In the reader and the reader is of type: " + readerType);
 			//reader = readerFactory.makeReader(context, readerType);
 			
-			System.out.println("Condition is :  " + condition);
+			System.out.println("Condition is :  " + jobTrigger.getCondition());
 			
-			if (condition != null){
+			if (jobTrigger.getCondition() != "default"){
 				//reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);	
 				
 				FileSystem fs = FileSystem.get(conf);
@@ -247,7 +247,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 					
 					if(stat.getPath().toUri().getPath().toString().contains(checker)){
 						System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
-						reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, condition);
+						reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, jobTrigger.getCondition());
 						
 						while(reader.next()){
 							reduce(reader.getKey(), reader.getValue(), context);
@@ -259,7 +259,7 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 			}	
 			else{
 				
-				reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);
+				reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, jobTrigger.getCondition());
 				
 				FileSystem fs = FileSystem.get(conf);
 				Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + " / " + context.getTaskAttemptID().toString());

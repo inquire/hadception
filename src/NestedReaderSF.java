@@ -23,7 +23,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 	Writable value = null;
 	
 	
-	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public NestedReaderSF(org.apache.hadoop.mapreduce.Mapper.Context context) 
 			throws IOException{
@@ -58,7 +58,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		path = new Path("/tmp/outputs/2/part-r-00000");
 		*/
-		if (condition != null){ 
+		if (condition != "default"){ 
 			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
 		}else{
 			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
@@ -77,6 +77,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 	
 	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
 	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public NestedReaderSF(org.apache.hadoop.mapreduce.Reducer.Context context) 
 			throws IOException{
@@ -113,7 +114,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 		
 		System.out.println(condition);
 		
-		if(condition != null){
+		if(condition != "default"){
 			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
 		}else{
 			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
@@ -195,11 +196,6 @@ public class NestedReaderSF implements CommonReaderUtils{
 		value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
 		
 	}
-	
-	
-	
-	
-	
 	
 	protected SequenceFile.Reader getReader(){
 		return reader;

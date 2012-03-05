@@ -2,9 +2,15 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import java.net.URI;
+import java.security.PermissionCollection;
+import java.security.acl.Permission;
+
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsAction;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
 //import org.apache.hadoop.io.SequenceFile.Writer;
@@ -43,9 +49,11 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  System.out.println(uniqueID);
 	  fs = FileSystem.get(URI.create(uniqueID),conf);
 	  path = new Path(uniqueID);
+	  FileUtil.chmod(path.toString(), "-rwxr--rwr");
   
 	}
 	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public NestedWriterSF(org.apache.hadoop.mapreduce.Mapper.Context context) throws Exception{
 	
@@ -72,9 +80,10 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  uniqueID = innerWorks + "/inceptions/" + jobName + "/" + mapInput.toString();
 	  fs = FileSystem.get(URI.create(uniqueID),conf);
 	  path = new Path(uniqueID);
+	  FileUtil.chmod(path.toString(), "-rwxr--rwr");
 	  
 	}
-	
+	@Deprecated
 	@SuppressWarnings({ "rawtypes"})
 	public NestedWriterSF(org.apache.hadoop.mapreduce.Reducer.Context context) throws Exception{
 	
@@ -83,7 +92,6 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  
 	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()),conf);
 	  path = new Path("/tmp/inceptions/" + mapInput.toString());
-	 
 	}
 	
 	@Override
@@ -93,8 +101,10 @@ public class NestedWriterSF implements CommonWriterUtils{
 			System.out.println(key.getClass().getName());
 			System.out.println(value.getClass().getName());
 			
+			
 			writer = SequenceFile.createWriter(fs, conf, path, 
 				  	key.getClass(),value.getClass());
+
 			
 			writer.append(key, value);
 		}else{
@@ -114,7 +124,8 @@ public class NestedWriterSF implements CommonWriterUtils{
 	 */
 	@Override
 	public void close(){
+		
 		  IOUtils.closeStream(writer);
-
+		  
 	}
 }

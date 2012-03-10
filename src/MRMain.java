@@ -1,3 +1,5 @@
+//package uk.ac.ed.inf.hadception.example;
+
 
 import java.io.IOException;
 import java.util.*;
@@ -22,7 +24,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-
+//import uk.ac.ed.inf.hadception.nesting.*;
  
 
 public class MRMain extends Configured implements Tool{
@@ -121,7 +123,7 @@ public Path workingPath;
 	            sum += val.get();
 	        }
 	       writer.write(key, new IntWritable(sum));
-		 
+	       condition.setCondition("something");
 	 }
 	 
 	 

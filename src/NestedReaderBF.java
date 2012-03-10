@@ -1,3 +1,5 @@
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,7 +36,7 @@ public class NestedReaderBF implements CommonReaderUtils{
 		//FIXME automagically path allocation
 		
 		conf = context.getConfiguration();
-		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		//TaskAttemptID sequenceOut = context.getTaskAttemptID();
 		//fs = FileSystem.get(URI.create("/tmp/inceptions/" + sequenceOut.toString()), conf);
 		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		

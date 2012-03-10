@@ -1,3 +1,5 @@
+
+
 import java.io.IOException;
 import java.net.URI;
 
@@ -9,7 +11,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.util.ReflectionUtils;
-
 
 public class NestedReaderSF implements CommonReaderUtils{
 
@@ -31,7 +32,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 		//FIXME automagically path allocation;
 		
 		conf = context.getConfiguration();
-		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		//TaskAttemptID sequenceOut = context.getTaskAttemptID();
 		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
 		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
 		path = new Path("/tmp/outputs/2/part-r-00000");
@@ -141,7 +142,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 		//FIXME automagically path allocation;
 		
 		conf = context.getConfiguration();
-		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		//TaskAttemptID sequenceOut = context.getTaskAttemptID();
 		
 		/*
 		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
@@ -173,7 +174,7 @@ public class NestedReaderSF implements CommonReaderUtils{
 		//FIXME automagically path allocation;
 		
 		conf = context.getConfiguration();
-		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		//TaskAttemptID sequenceOut = context.getTaskAttemptID();
 		
 		/*
 		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);

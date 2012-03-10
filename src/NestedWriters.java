@@ -1,6 +1,8 @@
+
+
 import org.apache.hadoop.fs.Path;
 
-
+@Deprecated
 public class NestedWriters<KEYIN, VALUEIN> {
 
 	NestedWriterSF sequenceWriter;

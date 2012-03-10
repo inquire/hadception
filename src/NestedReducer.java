@@ -1,10 +1,13 @@
+
+
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.mapred.RawKeyValueIterator;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.net.URI;
 
 import org.apache.hadoop.mapreduce.*;
@@ -28,7 +31,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
 
+//import uk.ac.ed.inf.hadception.io.writers.*;
+//import uk.ac.ed.inf.hadception.io.readers.*;
 
+@Deprecated
 public class NestedReducer<KEYIN,VALUEIN,KEYOUT,VALUEOUT> extends Reducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT>{
 
 

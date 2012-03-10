@@ -1,3 +1,5 @@
+
+
 import java.io.IOException;
 import java.util.*;
 
@@ -21,7 +23,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 
-
+@Deprecated
 public class NestedJobs {
 	
 	private String nestedName = "Nested Job"; // needs detailed path & implementation
@@ -44,7 +46,7 @@ public class NestedJobs {
 		SequenceFileInputFormat.addInputPath(nestedJob,input);
 		SequenceFileOutputFormat.setOutputPath(nestedJob, output);
 		
-		nestedJob.setJarByClass(MRMain.class);
+		//nestedJob.setJarByClass(MRMain.class);
 	}
 
 

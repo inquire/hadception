@@ -48,4 +48,8 @@ jar cvf inception.jar -C inception .
 
 echo "Starting job on cluster!"
 #hadoop jar inception.jar MRMain -libjars inception.jar /tmp/nestin /tmp/outputs/1
+# Pre package version
+#hadoop jar inception.jar MRMain -libjars inception.jar /tmp/nestin /tmp/outputs/
+# Package version
+
 hadoop jar inception.jar MRMain -libjars inception.jar /tmp/nestin /tmp/outputs/

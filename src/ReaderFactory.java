@@ -1,5 +1,6 @@
-import org.apache.hadoop.fs.Path;
 
+
+import org.apache.hadoop.fs.Path;
 
 public class ReaderFactory {
 
@@ -36,6 +37,7 @@ public class ReaderFactory {
 	
 	//========================== Factories for development with fixed path ========================
 	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public CommonReaderUtils makeReader(org.apache.hadoop.mapreduce.Mapper.Context context,
 			String readerType) throws Exception{
@@ -53,6 +55,7 @@ public class ReaderFactory {
 	
 	// TODO add makeReader details (when running it from a Reduce task)
 	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public CommonReaderUtils makeReader(org.apache.hadoop.mapreduce.Reducer.Context context,
 			String readerType) throws Exception{

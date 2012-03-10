@@ -1,3 +1,5 @@
+
+
 import org.apache.hadoop.fs.Path;
 
 
@@ -9,6 +11,7 @@ public class WriterFactory {
 	
 	// ==================== Factories for development with fixed path =============================
 	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Mapper.Context context, 
 			String writerType) throws Exception{
@@ -24,6 +27,7 @@ public class WriterFactory {
 		return null;
 	}
 	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public CommonWriterUtils makeWriter(org.apache.hadoop.mapreduce.Reducer.Context context,
 			String writerType) throws Exception{

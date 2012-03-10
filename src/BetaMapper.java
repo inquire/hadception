@@ -1,5 +1,8 @@
+
+
+
 import java.io.IOException;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -19,6 +22,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+//import uk.ac.ed.inf.hadception.io.writers.*;
+//import uk.ac.ed.inf.hadception.io.readers.*;
+
+
 public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
 
 	Configuration conf = new Configuration();
@@ -36,7 +43,7 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 	String nestedLevel = null;
 	
 	WriterFactory writerFactory = new WriterFactory();
-	CommonWriterUtils writer;
+	protected CommonWriterUtils writer;
 	
 	ReaderFactory readerFactory = new ReaderFactory();
 	CommonReaderUtils reader;
@@ -261,10 +268,12 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 		}	
 		else{
 			
+			//XXX Bug here
+			
 			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, jobTrigger.getCondition());
 			
 			FileSystem fs = FileSystem.get(conf);
-			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + " / " + context.getTaskAttemptID().toString());
+			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
 			FileStatus[]stats = fs.listStatus(dir);
 			
 			for(FileStatus stat : stats){

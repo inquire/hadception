@@ -1,19 +1,25 @@
+
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import java.net.URI;
-import java.security.PermissionCollection;
-import java.security.acl.Permission;
+//import java.security.PermissionCollection;
+//import java.security.acl.Permission;
 
+//import org.apache.hadoop.log.LogLevel;
+//import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapreduce.*;
+//import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsAction;
-import org.apache.hadoop.fs.permission.FsPermission;
+//import org.apache.hadoop.fs.permission.FsAction;
+//import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
 //import org.apache.hadoop.io.SequenceFile.Writer;
+//import org.apache.hadoop.io.SequenceFile.CompressionType;
 
 
 /**
@@ -102,11 +108,15 @@ public class NestedWriterSF implements CommonWriterUtils{
 			System.out.println(value.getClass().getName());
 			
 			
-			writer = SequenceFile.createWriter(fs, conf, path, 
-				  	key.getClass(),value.getClass());
-
+			//writer = SequenceFile.createWriter(fs, conf, path, 
+			//	  	key.getClass(),value.getClass());
 			
+			//CompressionType compressionType = new org.apache.hadoop.io.compress.DefaultCodec();
+			writer = SequenceFile.createWriter(fs, conf, path,
+					key.getClass(), value.getClass());
+
 			writer.append(key, value);
+		
 		}else{
 			writer.append(key, value);
 		}

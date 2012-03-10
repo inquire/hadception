@@ -1,3 +1,6 @@
+
+
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -31,7 +34,10 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
 
+//import uk.ac.ed.inf.hadception.io.writers.*;
+//import uk.ac.ed.inf.hadception.io.readers.*;
 
+@Deprecated
 public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
 	
 	Configuration conf = new Configuration(); 
@@ -170,7 +176,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	WriterFactory writerFactory = new WriterFactory();
 	CommonWriterUtils writer;
 	
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, 
 		ClassNotFoundException, InstantiationException, IllegalAccessException{
 

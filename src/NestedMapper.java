@@ -9,7 +9,7 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 
 import java.net.URI;
 
-import org.apache.hadoop.mapred.MultiFileInputFormat;
+//import org.apache.hadoop.mapred.MultiFileInputFormat;
 import org.apache.hadoop.mapred.join.InnerJoinRecordReader;
 import org.apache.hadoop.mapred.lib.MultipleInputs;
 import org.apache.hadoop.mapreduce.*;

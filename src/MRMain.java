@@ -33,14 +33,15 @@ public Path workingPath;
 	
  public static class Map extends BetaMapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
+    private final static LongWritable two = new LongWritable(2);
     private Text word = new Text();
 
    
 	@Override
     protected void nestedMap (LongWritable key, Text value, JobTrigger condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
-		  writer.write(value, " ");
-		  condition.setCondition("something");
+		  writer.write(two, value);
+		  condition.setCondition("default");
 	  }
     
 	@Override
@@ -48,7 +49,7 @@ public Path workingPath;
 	protected void setupNesting(Job job2, Configuration conf, JobTrigger condition) throws IOException{
 	    //job2 = new Job(conf, "Layer2");
 
-    	job2.setJobName("Layer-2-Mapper-No");
+    	job2.setJobName("IntermediateMaps");
 
     	job2.setNumReduceTasks(1);
 
@@ -57,7 +58,8 @@ public Path workingPath;
 
     	job2.setMapperClass(FinalMapM.class);
 
-    	job2.setInputFormatClass(TextInputFormat.class);
+    	job2.setInputFormatClass(SequenceFileInputFormat.class);
+    	//job2.setInputFormatClass(TextInputFormat.class);
     	job2.setOutputFormatClass(SequenceFileOutputFormat.class);
 
     	
@@ -78,6 +80,8 @@ public Path workingPath;
         
         while (tokenizer.hasMoreTokens()) {
             word.set(tokenizer.nextToken().toUpperCase());
+        	System.out.println("Here we go with weird stuff: " + word +" / "+ one);
+
             context.write(word, one);
         }
     }
@@ -111,6 +115,22 @@ public Path workingPath;
 	 }
 	 
  }
+ 
+ public static class MinimalReduce extends Reducer<Text, IntWritable, Text, IntWritable>{
+	 
+	 @Override
+	 protected void reduce(Text key, Iterable<IntWritable> values, Context context)
+	 	throws IOException, InterruptedException{
+		 
+		 int sum = 0;
+	        for (IntWritable val : values) {
+	            sum += val.get();
+	        }
+	       context.write(key, new IntWritable(sum));
+	       //condition.setCondition("something");
+	 }
+	 
+ }
     
  public static class Reduce extends BetaReducer<Text, IntWritable, Text, IntWritable> {
 
@@ -122,6 +142,8 @@ public Path workingPath;
 	        for (IntWritable val : values) {
 	            sum += val.get();
 	        }
+	       System.out.println(key + " / " + sum);
+	       System.out.println(key.getClass().toString() + " // " + sum);
 	       writer.write(key, new IntWritable(sum));
 	       condition.setCondition("something");
 	 }
@@ -132,14 +154,15 @@ public Path workingPath;
 	 protected void setupNesting(Job job2, Configuration conf, JobTrigger condition) throws IOException{
 		 //job2 = new Job(conf, "Layer2");
 
-		 job2.setJobName("Layer-2-Reducer-No");
+		 job2.setJobName("IntermediateReducers");
 
 		 job2.setOutputKeyClass(Text.class); // modified here
-		 job2.setOutputValueClass(IntWritable.class);		// modified here
+		 job2.setOutputValueClass(Text.class);		// modified here
 
 		 job2.setMapperClass(FinalMapR.class);
 
-		 job2.setInputFormatClass(SequenceFileInputFormat.class);
+		 //job2.setInputFormatClass(SequenceFileInputFormat.class);
+		 job2.setInputFormatClass(TextInputFormat.class);
 		 job2.setOutputFormatClass(SequenceFileOutputFormat.class);
 
 		 if (jobTrigger.getCondition().equals("something")){
@@ -159,13 +182,13 @@ public Path workingPath;
   	*/
  }
  
- public static class FinalMapR extends Mapper<Text, IntWritable, Text, IntWritable>{
+ public static class FinalMapR extends Mapper<LongWritable, Text, Text, Text>{
 	 
-	 public void map (Text key, IntWritable value, Context context)
+	 public void map (LongWritable key, Text value, Context context)
 			 throws IOException, InterruptedException{
 		 
 		 System.out.println("Stuff is going on here: " + key.toString() + " / " + value.toString());
-		 context.write(key, value);
+		 context.write(value, new Text(" "));
 	 }
 	 
  }
@@ -187,7 +210,7 @@ public Path workingPath;
  		
  		FileInputFormat.setInputPaths(job, new Path(args[0]));
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-		
+ 		
 		job.setJarByClass(MRMain.class);
 	
 		job.submit();

@@ -19,7 +19,7 @@ public class NestedWriterBF implements CommonWriterUtils{
 	Path path;
 	String uniqueID;
 	
-	String delimiter = " ";
+	String delimiter = "\t";
 	
 	@SuppressWarnings("rawtypes")
 	public NestedWriterBF(org.apache.hadoop.mapreduce.Mapper.Context context,

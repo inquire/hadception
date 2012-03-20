@@ -63,8 +63,10 @@ public class NestedReaderSF implements CommonReaderUtils{
 			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
 		}else{
 			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
-
+			
 		}
+		
+		
 		fs = FileSystem.get(URI.create(uniqueID),conf);
 		path = new Path(uniqueID);
 		

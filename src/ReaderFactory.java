@@ -17,6 +17,8 @@ public class ReaderFactory {
 			return new NestedReaderSF(context, agreggatePath, condition);
 		}
 		
+		System.out.println("Give me null!!");
+		
 		return null;
 		
 	}
@@ -81,11 +83,11 @@ public class ReaderFactory {
 			return new NestedReaderSF(context ,innerWorks, jobName, condition);
 		}
 		
-		/*
+		
 		if (readerType == "BufferFile"){
-			return new NestedReaderBF(context, innerWorks, jobName);
+			return new NestedReaderBF(context, innerWorks, jobName, condition);
 		}
-		*/
+		
 		
 		return null;
 	}
@@ -98,12 +100,10 @@ public class ReaderFactory {
 			return new NestedReaderSF(context ,innerWorks, jobName, condition);
 		}
 		
-		
-		/*
 		if (readerType == "BufferFile"){
-			return new NestedReaderBF(context, innerWorks, jobName);
+			return new NestedReaderBF(context, innerWorks, jobName, condition);
 		}
-		*/
+		
 		
 		return null;
 	}

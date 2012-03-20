@@ -16,20 +16,26 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 
 public class NestedReaderBF implements CommonReaderUtils{
 
+	
 	BufferedReader reader;
-	String currentLine;
-	String [] keyValuePair;
-	String delimiter = " ";
-	
-	//XXX fix the variable instantiation (add reflection or something)
-	
-	LongWritable key = new LongWritable();
-	Text value = new Text();
-	
 	Configuration conf;
 	FileSystem fs;
 	Path path;
+	String uniqueID;
 	
+	String currentLine;
+	String [] keyValuePair;
+	String delimiter = "\t";
+	
+	//XXX fix the variable instantiation (add reflection or something)
+	
+	
+	Text key = new Text();
+	Text value = new Text();
+	
+	
+	
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Mapper.Context context) throws IOException{
 		
@@ -48,8 +54,35 @@ public class NestedReaderBF implements CommonReaderUtils{
 		
 	}
 	
-	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
+	public NestedReaderBF(org.apache.hadoop.mapreduce.Mapper.Context context,
+			Path innerWorks, String jobName, String condition) throws IOException{
+		
+		conf = context.getConfiguration();
+		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		
+		/*
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		path = new Path("/tmp/outputs/2/part-r-00000");
+		*/
+		if (condition != "default"){ 
+			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
+		}else{
+			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
+
+		}
+		fs = FileSystem.get(URI.create(uniqueID),conf);
+		path = new Path(uniqueID);
+		
+		reader = new BufferedReader(new InputStreamReader(fs.open(path)));
+		
+	}
 	
+	
+	
+	
+	//XXX Reducer Nested Job will fail!! (caused by current path allocations)
+	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Reducer.Context context) throws IOException{
 		
@@ -63,6 +96,30 @@ public class NestedReaderBF implements CommonReaderUtils{
 		reader = new BufferedReader(new InputStreamReader(fs.open(path)));
 		//key = (Text) ReflectionUtils.newInstance(Text.class, conf);
 		//value = (Text) ReflectionUtils.newInstance(Text.class, conf);
+		
+	}
+	
+	public NestedReaderBF(org.apache.hadoop.mapreduce.Reducer.Context context,
+			Path innerWorks, String jobName, String condition) throws IOException{
+		
+		conf = context.getConfiguration();
+		TaskAttemptID sequenceOut = context.getTaskAttemptID();
+		
+		/*
+		fs = FileSystem.get(URI.create("/tmp/outputs/2/part-r-00000"), conf);
+		//path = new Path("/tmp/inceptions/" + sequenceOut.toString());
+		path = new Path("/tmp/outputs/2/part-r-00000");
+		*/
+		if (condition != "default"){ 
+			uniqueID = innerWorks + "/outputs/" + jobName + "/" + sequenceOut.toString() + "/" + "/part-r-00000";
+		}else{
+			uniqueID = innerWorks + "/inceptions/" + jobName + "/" + sequenceOut.toString();
+
+		}
+		fs = FileSystem.get(URI.create(uniqueID),conf);
+		path = new Path(uniqueID);
+		
+		reader = new BufferedReader(new InputStreamReader(fs.open(path)));
 		
 	}
 	
@@ -93,9 +150,13 @@ public class NestedReaderBF implements CommonReaderUtils{
 			
 			breakString();
 			System.out.println("Printing stuff: " + currentLine);
-			key.set(Long.valueOf( keyValuePair[0]));
+			//key.set(Long.valueOf( keyValuePair[0]));
+			
+			key.set(keyValuePair[0]);
 			System.out.println("Key is: " + key);
-			value.set(currentLine.substring(keyValuePair[0].length()));
+			//value.set(currentLine.substring(keyValuePair[0].length()));
+			//value.set(currentLine.substring(keyValuePair[0].length()
+			value.set(keyValuePair[1]);
 			System.out.println("Value is: " + value);
 
 			return true;

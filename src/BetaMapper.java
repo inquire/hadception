@@ -163,6 +163,12 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 			writerType = "BufferFile";
 		}
 		
+		if(jobTrigger.getCondition().equals("default")){
+			if (TextInputFormat.class.getName() == nestedJob.getInputFormatClass().getName()){
+				readerType = "BufferFile";
+			}
+		}
+		
 		
 		//FIXME either fix or remove bufered output all together 
 		
@@ -276,9 +282,11 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
 			FileStatus[]stats = fs.listStatus(dir);
 			
+			/*
 			for(FileStatus stat : stats){
 				System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath());
 			}
+			*/
 			
 			while(reader.next()){
 				map(reader.getKey(), reader.getValue(), context);

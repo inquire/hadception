@@ -155,11 +155,19 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 		// !! - will crash if called because nestedJobOutputPath has been moved to executeNestedJob 
 		//      as to put the job type output somewhere
 
+		/*
 		if(TextOutputFormat.class.getName() == nestedJob.getOutputFormatClass().getName()){
 			FileOutputFormat.setOutputPath(nestedJob, nestedJobOutputPath);
 			readerType = "BufferFile";
 		}
+		*/
 			
+		if(jobTrigger.getCondition().equals("default")){
+			if (TextInputFormat.class.getName() == nestedJob.getInputFormatClass().getName()){
+				readerType = "BufferFile";
+			}
+		}
+		
 			
 	}
 	
@@ -274,9 +282,11 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 				System.out.println(dir);
 				FileStatus[]stats = fs.listStatus(dir);
 				
+				/*
 				for(FileStatus stat : stats){
 					System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath());
 				}
+				*/
 				
 				while(reader.next()){
 					reduce(reader.getKey(), reader.getValue(), context);

@@ -1,3 +1,5 @@
+package uk.ac.ed.inf.nmr.readers;
+
 
 
 import java.io.BufferedReader;
@@ -8,7 +10,6 @@ import java.net.URI;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
@@ -54,6 +55,7 @@ public class NestedReaderBF implements CommonReaderUtils{
 		
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Mapper.Context context,
 			Path innerWorks, String jobName, String condition) throws IOException{
 		
@@ -99,6 +101,7 @@ public class NestedReaderBF implements CommonReaderUtils{
 		
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public NestedReaderBF(org.apache.hadoop.mapreduce.Reducer.Context context,
 			Path innerWorks, String jobName, String condition) throws IOException{
 		

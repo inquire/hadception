@@ -1,3 +1,6 @@
+package uk.ac.ed.inf.nmr.mapreduce;
+
+
 
 
 
@@ -22,11 +25,18 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import uk.ac.ed.inf.nmr.readers.CommonReaderUtils;
+import uk.ac.ed.inf.nmr.readers.ReaderFactory;
+import uk.ac.ed.inf.nmr.writers.CommonWriterUtils;
+import uk.ac.ed.inf.nmr.writers.WriterFactory;
+
+//import uk.ac.ed.inf.nmr.writers.WriterFactory;
+
 //import uk.ac.ed.inf.hadception.io.writers.*;
 //import uk.ac.ed.inf.hadception.io.readers.*;
 
 
-public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
+public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
 
 	Configuration conf = new Configuration();
 	Job nestedJob;
@@ -278,9 +288,9 @@ public class BetaMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN, 
 			
 			reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, jobTrigger.getCondition());
 			
-			FileSystem fs = FileSystem.get(conf);
-			Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
-			FileStatus[]stats = fs.listStatus(dir);
+			//FileSystem fs = FileSystem.get(conf);
+			//Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
+			//FileStatus[]stats = fs.listStatus(dir);
 			
 			/*
 			for(FileStatus stat : stats){

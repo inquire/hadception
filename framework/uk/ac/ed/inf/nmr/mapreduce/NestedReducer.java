@@ -1,3 +1,6 @@
+package uk.ac.ed.inf.nmr.mapreduce;
+
+
 
 
 
@@ -11,7 +14,6 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -19,11 +21,16 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import uk.ac.ed.inf.nmr.readers.CommonReaderUtils;
+import uk.ac.ed.inf.nmr.readers.ReaderFactory;
+import uk.ac.ed.inf.nmr.writers.CommonWriterUtils;
+import uk.ac.ed.inf.nmr.writers.WriterFactory;
+
 //import uk.ac.ed.inf.hadception.io.writers.*;
 //import uk.ac.ed.inf.hadception.io.readers.*;
 
 
-public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT>{
+public class NestedReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT>{
 	
 	Configuration conf = new Configuration();
 	Job nestedJob;
@@ -277,10 +284,10 @@ public class BetaReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEYIN
 				
 				reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, jobTrigger.getCondition());
 				
-				FileSystem fs = FileSystem.get(conf);
+				//FileSystem fs = FileSystem.get(conf);
 				Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
 				System.out.println(dir);
-				FileStatus[]stats = fs.listStatus(dir);
+				//FileStatus[]stats = fs.listStatus(dir);
 				
 				/*
 				for(FileStatus stat : stats){

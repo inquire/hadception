@@ -23,26 +23,25 @@ USER_CODE = "jobs/*.java"
 HADOOP_INPUT = "/tmp/nestin"
 HADOOP_OUTPUT = "/tmp/outputs"
 
-HDFS_CLEAN = ['inceptions', 'outputs']
+# Cleaning Files #
 
-
-# Cleaning Files
+# list of locations on HDFS that you would like to clean
+HDFS_CLEAN = ['/tmp/inceptions', '/tmp/outputs', '/tmp/nestout']
 
 CLEAN.include(['framejar', 'inception', 'bin', 'buildbin', 'uk', 'META-INF'])
-task :default => [:clean, :cleanHDFS, :build, :compile, :package, :clean, :deploy]
+task :default => [:cleanHDFS, :cleanJAR, :build, :compile, :package, :deploy, :clean]
 
-desc "Cleaning HDFS locations..."
+desc "Cleaning HDFS locations."
 task :cleanHDFS do
   begin
     puts "Cleaning HDFS locations"
-    #HDFS_CLEAN.each do |cleaners|
-    `hadoop fs -rmr /tmp/inceptions`
-    `hadoop fs -rmr /tmp/outputs`
-     # `hadoop fs -rmr /tmp/#{cleaners}`
+    HDFS_CLEAN.each do |cleaners|
+      `hadoop fs -rmr #{cleaners}`
+    end
   end
 end
 
-desc "Buildling the NMR framework..."
+desc "Buildling the NMR framework."
 task :build  do
   begin
     puts "\n>>>> Build release: #{NAME} <<<<\n\n"
@@ -56,7 +55,7 @@ task :build  do
   end
 end
 
-desc "Compile user code..."
+desc "Compile user code with NMR framework."
 task :compile do
   begin
     puts "Compiling user code with default frameworks and NMR."
@@ -66,7 +65,7 @@ task :compile do
   end
 end
 
-desc "Package code for cluster..."
+desc "Package code for cluster."
 task :package do
   begin
     puts "Creating a jar with user code and the NMR framework."
@@ -84,8 +83,8 @@ task :deploy do
   end
 end
 
-desc "Clear jars."
-task :clearjar do
+desc "Clear user code & NMR JARs."
+task :cleanJAR do
   begin
   `rm #{DEPLOYMENT_NAME}.jar`
   `rm #{FRAMEWORK_NAME}.jar`

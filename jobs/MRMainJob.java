@@ -26,7 +26,7 @@ import uk.ac.ed.inf.nmr.mapreduce.NestedMapper;
 import uk.ac.ed.inf.nmr.mapreduce.NestedReducer;
 
 
-public class DefaultTest extends Configured implements Tool{
+public class MRMainJob extends Configured implements Tool{
        
 public Path workingPath;
 	
@@ -159,8 +159,6 @@ public Path workingPath;
 		 job2.setOutputValueClass(Text.class);		// modified here
 
 		 job2.setMapperClass(FinalMapR.class);
-		
-	 	 job2.setJarByClass(MRMainJob.class);
 
 		 //job2.setInputFormatClass(SequenceFileInputFormat.class);
 		 job2.setInputFormatClass(TextInputFormat.class);
@@ -205,8 +203,6 @@ public Path workingPath;
  		job.setMapperClass(Map.class);
  		job.setReducerClass(Reduce.class);
 
-		job.setNumReduceTasks(5);
-		
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);
  		
@@ -223,6 +219,6 @@ public Path workingPath;
  	public static void main(String[] args) throws Exception {
  		Configuration conf = new Configuration();
  		String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
- 		ToolRunner.run(new DefaultTest(), otherArgs);
+ 		ToolRunner.run(new MRMainJob(), otherArgs);
  	}
 }

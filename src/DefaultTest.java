@@ -29,13 +29,12 @@ public Path workingPath;
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
 
-   
-	protected Map (Text key, IntWritable value, Context context) throws IOException, InterruptedException{
+	public void map (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
     	String line = value.toString();
         StringTokenizer tokenizer = new StringTokenizer(line);
         
         while (tokenizer.hasMoreTokens()) {
-            word.set(tokenizer.nextToken().toUpperCase());
+            word.set(tokenizer.nextToken());
         	System.out.println("Here we go with weird stuff: " + word +" / "+ one);
 
             context.write(word, one);
@@ -45,8 +44,7 @@ public Path workingPath;
     
  public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable>{
 	 
-	 @Override
-	 protected void reduce(Text key, Iterable<IntWritable> values, Context context)
+	 public void reduce(Text key, Iterable<IntWritable> values, Context context)
 	 	throws IOException, InterruptedException{
 		 
 		 int sum = 0;

@@ -62,6 +62,8 @@ public Path workingPath;
 
  		Job job = new Job();
 
+ 		job.setJobName("DefaultTest");
+ 		
  		job.setOutputKeyClass(Text.class);
  		job.setOutputValueClass(IntWritable.class);
 

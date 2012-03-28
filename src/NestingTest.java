@@ -76,6 +76,8 @@ public Path workingPath;
  	public int run(String[] args) throws Exception {
 
  		Job job = new Job();
+ 		
+ 		job.setJobName("NestingTest");
 
  		job.setOutputKeyClass(Text.class);
  		job.setOutputValueClass(IntWritable.class);

@@ -159,6 +159,7 @@ public Path workingPath;
 		 job2.setOutputValueClass(Text.class);		// modified here
 
 		 job2.setMapperClass(FinalMapR.class);
+		job2.setJarByClass(MRMain.class);
 
 		 //job2.setInputFormatClass(SequenceFileInputFormat.class);
 		 job2.setInputFormatClass(TextInputFormat.class);

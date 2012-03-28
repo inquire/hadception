@@ -52,7 +52,7 @@ public class WriterFactory {
 			Path innerWorks, String jobName, String writerType) throws Exception{
 
 		if (writerType == "SequenceFile"){
-			System.out.println("i'm here");
+			////System.out.println("i'm here");
 			return new NestedWriterSF(context, innerWorks, jobName);
 		}
 		

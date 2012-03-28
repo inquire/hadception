@@ -203,7 +203,7 @@ public class NestedReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEY
 	}
 	
 	protected void nestedReducer (KEYIN key, Iterable<VALUEIN> values, JobTrigger jobTrigger ) throws IOException, InterruptedException{
-		System.out.println(key + " / " + values);
+		////System.out.println(key + " / " + values);
 	
 		for (VALUEIN val : values){
 			writer.write(key, val);
@@ -249,10 +249,10 @@ public class NestedReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEY
 	private void setupNormalReducer(Context context) throws Exception {
 
 		//try{
-			System.out.println("In the reader and the reader is of type: " + readerType);
+		////	System.out.println("In the reader and the reader is of type: " + readerType);
 			//reader = readerFactory.makeReader(context, readerType);
 			
-			System.out.println("Condition is :  " + jobTrigger.getCondition());
+			////System.out.println("Condition is :  " + jobTrigger.getCondition());
 			
 			if (jobTrigger.getCondition() != "default"){
 				//reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);	
@@ -267,7 +267,7 @@ public class NestedReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEY
 					//System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
 					
 					if(stat.getPath().toUri().getPath().toString().contains(checker)){
-						System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
+						////System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
 						reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, jobTrigger.getCondition());
 						
 						while(reader.next()){
@@ -286,7 +286,7 @@ public class NestedReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEY
 				
 				//FileSystem fs = FileSystem.get(conf);
 				Path dir = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
-				System.out.println(dir);
+				////System.out.println(dir);
 				//FileStatus[]stats = fs.listStatus(dir);
 				
 				/*
@@ -314,7 +314,7 @@ public class NestedReducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Reducer<KEY
 	@SuppressWarnings("unchecked")
 	protected void reduce(Writable key, Writable value, Context context) throws IOException, InterruptedException{
 		
-		System.out.println(key.getClass().getName() +" / "+ value.getClass().getName());
+		////System.out.println(key.getClass().getName() +" / "+ value.getClass().getName());
 		
 		context.write((KEYOUT) key, (VALUEOUT) value);
 	}

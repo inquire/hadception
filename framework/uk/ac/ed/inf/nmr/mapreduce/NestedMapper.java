@@ -99,7 +99,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		// TODO implement an uniform naming scheme
 		//nestedJob.setJobName("Layer-2");
 		
-    	System.out.println("==>> " + jobTrigger.getCondition());
+    	////System.out.println("==>> " + jobTrigger.getCondition());
 
 		
 			setupInternalWR(context);
@@ -153,7 +153,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 		//nestedJobInputPath = writer.getPath();
 		
 		nestedJobInputPath = new Path(innerWorks + "/inceptions/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID().toString());
-		System.out.println(nestedJobInputPath);
+		////System.out.println(nestedJobInputPath);
 		//nestedJobInputPath = new Path("/tmp/outputs/1");
 		//nestedJobOutputPath = new Path("/tmp/outputs/2");
 		//nestedJobOutputPath = new Path(innerWorks + "/outputs/" + nestedJob.getJobName() + "/" + context.getTaskAttemptID());
@@ -187,7 +187,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	protected void setupNestedMap(Context context) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 
 		try {
-			System.out.println("In the writer and the type is : " + writerType);
+			////System.out.println("In the writer and the type is : " + writerType);
 			writer = writerFactory.makeWriter(context, innerWorks, nestedLevel, writerType);
 			//writer = new NestedWriterSF<KEYIN, VALUEIN>(context, innerWorks, nestedJob.getJobName());
 			//writer = writerFactory.makeWriter(context, writerType);
@@ -209,7 +209,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	}
 	
 	protected void nestedMap (KEYIN key, VALUEIN value, JobTrigger condition) throws IOException, InterruptedException{
-		System.out.println(key + " / " + value);
+		////System.out.println(key + " / " + value);
 	
 		writer.write(key, value);
 	}
@@ -253,10 +253,10 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	private void setupNormalMap(Context context) throws Exception {
 		
 		//try{
-		System.out.println("In the reader and the reader is of type: " + readerType);
+		////System.out.println("In the reader and the reader is of type: " + readerType);
 		//reader = readerFactory.makeReader(context, readerType);
 		
-		System.out.println("Condition is :  " + jobTrigger.getCondition());
+		////System.out.println("Condition is :  " + jobTrigger.getCondition());
 		
 		if (jobTrigger.getCondition() != "default"){
 			//reader = readerFactory.makeReader(context, innerWorks, nestedJob.getJobName(), readerType, condition);	
@@ -271,7 +271,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 				//System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
 				
 				if(stat.getPath().toUri().getPath().toString().contains(checker)){
-					System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
+					////System.out.println("There is hope yet! - " + stat.getPath().toUri().getPath().toString());
 					reader = readerFactory.makeReader(context, stat.getPath().toUri().getPath().toString(), readerType, jobTrigger.getCondition());
 					
 					while(reader.next()){
@@ -317,7 +317,7 @@ public class NestedMapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN
 	@SuppressWarnings("unchecked")
 	protected void map(Writable key, Writable value, Context context) throws IOException, InterruptedException{
 		
-		System.out.println(key.getClass().getName() +" / "+ value.getClass().getName());
+		////System.out.println(key.getClass().getName() +" / "+ value.getClass().getName());
 		
 		context.write((KEYOUT) key, (VALUEOUT) value);
 	}

@@ -152,15 +152,15 @@ public class NestedReaderBF implements CommonReaderUtils{
 			// TO DO: need to refine buffer reader
 			
 			breakString();
-			System.out.println("Printing stuff: " + currentLine);
+			////System.out.println("Printing stuff: " + currentLine);
 			//key.set(Long.valueOf( keyValuePair[0]));
 			
 			key.set(keyValuePair[0]);
-			System.out.println("Key is: " + key);
+			////System.out.println("Key is: " + key);
 			//value.set(currentLine.substring(keyValuePair[0].length()));
 			//value.set(currentLine.substring(keyValuePair[0].length()
 			value.set(keyValuePair[1]);
-			System.out.println("Value is: " + value);
+			////System.out.println("Value is: " + value);
 
 			return true;
 		}else{

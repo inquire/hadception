@@ -54,7 +54,7 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  */
 	  
 	  uniqueID = innerWorks + "/inceptions/" + jobName + "/" + mapInput.toString();
-	  System.out.println(uniqueID);
+	  ////System.out.println(uniqueID);
 	  fs = FileSystem.get(URI.create(uniqueID),conf);
 	  path = new Path(uniqueID);
 	  FileUtil.chmod(path.toString(), "-rwxr--rwr");
@@ -106,8 +106,8 @@ public class NestedWriterSF implements CommonWriterUtils{
 	public void write (Object key, Object value) throws IOException{ 
 		if (writer == null){
 			
-			System.out.println(key.getClass().getName());
-			System.out.println(value.getClass().getName());
+			////System.out.println(key.getClass().getName());
+			////System.out.println(value.getClass().getName());
 			
 			
 			//writer = SequenceFile.createWriter(fs, conf, path, 
@@ -123,7 +123,7 @@ public class NestedWriterSF implements CommonWriterUtils{
 			writer.append(key, value);
 		}
 		
-		System.out.println("Cica intra aici");
+		////System.out.println("Cica intra aici");
 
 	}
 	

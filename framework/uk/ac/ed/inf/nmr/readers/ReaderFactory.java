@@ -19,7 +19,7 @@ public class ReaderFactory {
 			return new NestedReaderSF(context, agreggatePath, condition);
 		}
 		
-		System.out.println("Give me null!!");
+		////System.out.println("Give me null!!");
 		
 		return null;
 		

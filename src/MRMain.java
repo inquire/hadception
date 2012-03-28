@@ -160,6 +160,7 @@ public Path workingPath;
 
 		 job2.setMapperClass(FinalMapR.class);
 		job2.setJarByClass(MRMain.class);
+		job2.setNumReduceTasks(2);
 
 		 //job2.setInputFormatClass(SequenceFileInputFormat.class);
 		 job2.setInputFormatClass(TextInputFormat.class);
@@ -207,6 +208,8 @@ public Path workingPath;
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);
  		
+  	job.setNumReduceTasks(2);
+
  		
  		FileInputFormat.setInputPaths(job, new Path(args[0]));
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));

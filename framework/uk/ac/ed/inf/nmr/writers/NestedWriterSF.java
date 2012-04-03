@@ -1,7 +1,5 @@
 package uk.ac.ed.inf.nmr.writers;
 
-
-
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -20,17 +18,13 @@ import org.apache.hadoop.fs.Path;
 //import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
-//import org.apache.hadoop.io.SequenceFile.Writer;
-//import org.apache.hadoop.io.SequenceFile.CompressionType;
 
 
 /**
  * Implementation for a nested writer that uses a SequenceFile as output.
  * It is meant to create an intermediate value to be used in a following nesting stage.
- * @author Jack
- *
- * @param <KEYIN> The class type of the key that gets serialized in the SequenceFile.
- * @param <VALUEIN> The class type of the value that gets serialized in the SequenceFile.
+ * @author Daniel Stanoescu
+
  */
 
 public class NestedWriterSF implements CommonWriterUtils{

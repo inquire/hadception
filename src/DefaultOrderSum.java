@@ -30,41 +30,43 @@ public Path workingPath;
 	
 public static class Map extends Mapper<LongWritable, Text, IntWritable, Text> {
     
-   protected void nestedMap (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
-	   String line = value.toString();
+   public void map (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
+	   	 String line = value.toString();
        StringTokenizer tokenizer = new StringTokenizer(line);
-       String record = null;
+       String record = " ";
        int sum = 0;
        
        for (int i = 0; i<tokenizer.countTokens(); i++){
        	if((i >= 2) && (i <= 9)){
-       		sum = sum + Integer.valueOf(tokenizer.nextToken(","));
-       	}else{
-       		record = record + tokenizer.nextToken(",");
+       		sum = sum + Integer.valueOf(tokenizer.nextToken(", "));
        	}
+       		record = record + tokenizer.nextToken(",") + " ";
        }
        	context.write(new IntWritable(sum), new Text(record));
 	}
 }
 
+
  	public int run(String[] args) throws Exception {
 
  		Job job = new Job();
 
- 		job.setJobName("DefaultTest");
+ 		job.setJobName("DefaultOrderSum-blockx20");
  		
  		job.setOutputKeyClass(IntWritable.class);
  		job.setOutputValueClass(Text.class);
 
  		job.setMapperClass(Map.class);
+		job.setNumReduceTasks(15);
+
 
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);
  		
- 		FileInputFormat.setInputPaths(job, new Path(args[0]));
+ 		FileInputFormat.addInputPath(job, new Path(args[0]));
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));
  		
-		job.setJarByClass(DefaultTest.class);
+		job.setJarByClass(DefaultOrderSum.class);
 	
 		job.submit();
 		return 0;

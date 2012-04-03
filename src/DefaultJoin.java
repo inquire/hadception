@@ -30,17 +30,17 @@ public Path workingPath;
 	
 public static class Map extends Mapper<LongWritable, Text, Text, Text> {
     
-   protected void nestedMap (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
-	   String line = value.toString();
+   public void map (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
+	   	 String line = value.toString();
        StringTokenizer tokenizer = new StringTokenizer(line);
        String record = "";
        String keyRecord = "";
        
        for (int i = 0; i<14; i++){
     	   if(i == 13){
-       		keyRecord = tokenizer.nextToken(",");
+       		keyRecord = tokenizer.nextToken(" ");
        	}else{
-       		record = record + tokenizer.nextToken(",") + " ";
+       		record = record + tokenizer.nextToken(" ") + " ";
        	}
        }
        	context.write(new Text(keyRecord), new Text(record));
@@ -51,7 +51,7 @@ public static class Map extends Mapper<LongWritable, Text, Text, Text> {
 
  		Job job = new Job();
 
- 		job.setJobName("DefaultJoin");
+ 		job.setJobName("DefaultJoin-block");
  		
  		job.setOutputKeyClass(Text.class);
  		job.setOutputValueClass(Text.class);
@@ -61,10 +61,14 @@ public static class Map extends Mapper<LongWritable, Text, Text, Text> {
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);
  		
- 		FileInputFormat.setInputPaths(job, new Path(args[0]));
+ 		FileInputFormat.addInputPath(job, new Path(args[0]));
+ 		//FileInputFormat.addInputPath(job, new Path("/user/s0838600/experiments/input/block"));
+		FileInputFormat.addInputPath(job, new Path("/user/s0838600/experiments/input/hdfs-blockx10"));
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));
  		
 		job.setJarByClass(DefaultTest.class);
+	
+		job.setNumReduceTasks(11);
 	
 		job.submit();
 		return 0;

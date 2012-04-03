@@ -47,9 +47,9 @@ public Path workingPath;
 	protected void setupNesting(Job job2, Configuration conf, JobTrigger condition) throws IOException{
     	job2.setJobName("IntermediateMaps");
 
-    	job2.setNumReduceTasks(2);
+    	job2.setNumReduceTasks(11);
 
-    	job2.setOutputKeyClass(Integer.class);
+    	job2.setOutputKeyClass(Text.class);
     	job2.setOutputValueClass(Text.class);
 
     	job2.setMapperClass(GetKeyMap.class);
@@ -57,17 +57,23 @@ public Path workingPath;
     	job2.setInputFormatClass(TextInputFormat.class);
     	job2.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-    	job2.setJarByClass(NestingOrderSum.class);
+    	job2.setJarByClass(NestingJoin.class);
+
+			//FileInputFormat.addInputPath(job2, new Path("/user/s0838600/experiments/input/blockx10"));
     	
     	if (condition.getCondition().equals("sort")){
-    		job2.setJobName("NOM-Sorting-Layer");
+    		job2.setJobName("NMR-blockx10-join");
+				System.out.println("I am here!");
+				FileInputFormat.addInputPath(job2, new Path("/user/s0838600/experiments/input/hdfs-blockx10"));
+				condition.setCondition("ejfnjenfjenfjenfj");
+				
     	}
 	}
  }   
 
  public static class GetKeyMap extends Mapper<LongWritable, Text, Text, Text> {
 	    
-	   protected void nestedMap (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
+	   public void map (LongWritable key, Text value, Context context) throws IOException, InterruptedException{
 		   String line = value.toString();
 	       StringTokenizer tokenizer = new StringTokenizer(line);
 	       String record = "";
@@ -89,7 +95,7 @@ public Path workingPath;
 
  		Job job = new Job();
  		
- 		job.setJobName("NestingJoin");
+ 		job.setJobName("NestingJoin-block");
 
  		job.setOutputKeyClass(Text.class);
  		job.setOutputValueClass(Text.class);
@@ -103,6 +109,8 @@ public Path workingPath;
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));
  		
 		job.setJarByClass(NestingJoin.class);
+	
+	job.setNumReduceTasks(11);
 	
 		job.submit();
 		return 0;

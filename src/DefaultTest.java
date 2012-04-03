@@ -35,12 +35,10 @@ public Path workingPath;
         
         while (tokenizer.hasMoreTokens()) {
             word.set(tokenizer.nextToken());
-        	System.out.println("Here we go with weird stuff: " + word +" / "+ one);
-
             context.write(word, one);
-	  }
+	  		}
 	}
- }    
+}    
     
  public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable>{
 	 
@@ -60,7 +58,7 @@ public Path workingPath;
 
  		Job job = new Job();
 
- 		job.setJobName("DefaultTest");
+ 		job.setJobName("DefaultTest-blockx15");
  		
  		job.setOutputKeyClass(Text.class);
  		job.setOutputValueClass(IntWritable.class);
@@ -68,7 +66,7 @@ public Path workingPath;
  		job.setMapperClass(Map.class);
  		job.setReducerClass(Reduce.class);
 
-		job.setNumReduceTasks(1);
+		job.setNumReduceTasks(15);
 		
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);

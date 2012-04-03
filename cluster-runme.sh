@@ -69,5 +69,5 @@ echo " "
 
 #hadoop jar inception.jar MRMain -D mapred.reduce.tasks=1 /user/s0838600/intheput /user/s0838600/nested_mr/new/test
 
-hadoop jar inception.jar $1 -D $2 $3
+hadoop jar inception.jar $1 -D mapred.reduce.tasks=1 $2 $3
 

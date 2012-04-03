@@ -77,7 +77,7 @@ public Path workingPath;
 
  		Job job = new Job();
  		
- 		job.setJobName("NestingTest");
+ 		job.setJobName("NestingTest-blockx15");
 
  		job.setOutputKeyClass(Text.class);
  		job.setOutputValueClass(IntWritable.class);
@@ -88,7 +88,7 @@ public Path workingPath;
  		job.setInputFormatClass(TextInputFormat.class);
  		job.setOutputFormatClass(TextOutputFormat.class);
  		
- 		job.setNumReduceTasks(1);
+ 		job.setNumReduceTasks(15);
  		
  		FileInputFormat.setInputPaths(job, new Path(args[0]));
  		FileOutputFormat.setOutputPath(job, new Path(args[1]));

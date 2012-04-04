@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640" />
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>Hadception by inquire</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/inquire/hadception">Fork Me on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Hadception</h1>
+            <h2>Nested Map-Reduce Framwork</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/inquire/hadception/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/inquire/hadception/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+      <span class="banner-fix"></span>
+
+      <section id="main_content">
+        <h1>Hadception</h1>
+
+<p>A nested map-reduce framework for the Apache Hadoop Project.</p>
+
+<h2>Requirements:</h2>
+
+<ul>
+<li>[*NIX] platform</li>
+<li>Java 1.6 JDK</li>
+<li>Hadoop Cluster (Single Node or Multiple Nodes)</li>
+</ul><h2>Building:</h2>
+
+<p>Set configurations in Rakefile and <code>rake</code></p>
+
+<p>Options you can invoke from <code>rake</code></p>
+
+<div class="highlight">
+<pre>
+<span class="n">build</span>      <span class="o">--</span> <span class="n">buildling</span> <span class="n">the</span> <span class="n">nmr</span> <span class="n">framework</span><span class="o">.</span>
+<span class="n">clean</span>      <span class="o">--</span> <span class="n">remove</span> <span class="n">any</span> <span class="n">temporary</span> <span class="n">products</span><span class="o">.</span>
+<span class="n">cleanHDFS</span>  <span class="o">--</span> <span class="n">cleaning</span> <span class="n">hdfs</span> <span class="n">locations</span><span class="o">.</span>
+<span class="n">clearjar</span>   <span class="o">--</span> <span class="n">clear</span> <span class="n">user</span> <span class="n">code</span> <span class="o">&amp;</span> <span class="n">nmr</span> <span class="n">jars</span><span class="o">.</span>
+<span class="n">clobber</span>    <span class="o">--</span> <span class="n">remove</span> <span class="n">any</span> <span class="n">generated</span> <span class="n">file</span><span class="o">.</span>
+<span class="n">compile</span>    <span class="o">--</span> <span class="n">compile</span> <span class="n">user</span> <span class="n">code</span> <span class="n">with</span> <span class="n">nmr</span> <span class="n">framework</span><span class="o">.</span>
+<span class="n">deploy</span>     <span class="o">--</span> <span class="n">deploy</span> <span class="n">to</span> <span class="n">cluster</span> <span class="n">with</span> <span class="n">default</span> <span class="n">settings</span><span class="o">.</span>
+<span class="n">package</span>    <span class="o">--</span> <span class="n">package</span> <span class="n">code</span> <span class="k">for</span> <span class="n">cluster</span><span class="o">.</span>
+</pre>
+</div>
+
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/inquire">inquire</a> can be found on <a href="https://github.com/inquire/hadception">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>

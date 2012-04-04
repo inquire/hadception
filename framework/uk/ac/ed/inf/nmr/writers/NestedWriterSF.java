@@ -1,39 +1,62 @@
 package uk.ac.ed.inf.nmr.writers;
 
+import java.net.URI;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import java.net.URI;
-//import java.security.PermissionCollection;
-//import java.security.acl.Permission;
-
-//import org.apache.hadoop.log.LogLevel;
-//import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapreduce.*;
-//import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-//import org.apache.hadoop.fs.permission.FsAction;
-//import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
 
 
 /**
  * Implementation for a nested writer that uses a SequenceFile as output.
- * It is meant to create an intermediate value to be used in a following nesting stage.
+ * It implements the outlines of the {@link CommonWriterUtils} interface.
  * @author Daniel Stanoescu
-
  */
 
 public class NestedWriterSF implements CommonWriterUtils{
 
+	/**
+	 * {@link SequenceFile} writer instance.
+	 */
+	
 	SequenceFile.Writer writer = null;
+	
+	/**
+	 * {@link Configuration} required to setup a {@link SequenceFile}.
+	 */
+	
 	Configuration conf;
+	
+	/**
+	 * {@link FileSystem} support for writing the {@link SequenceFile} to HDFS.
+	 */
+	
 	FileSystem fs;
+	
+	/**
+	 * Contains the path to the written {@link SequenceFile}. 
+	 */
+	
 	Path path;
+	
+	/**
+	 * Creates a unique path id using the jobname and task id.
+	 */
+	
 	String uniqueID;
+	
+	/**
+	 * Creates an intermediate SequenceFile where key/values will be written
+	 * @param context Uses the {@link Mapper} context to configure the SequenceFile writer.s
+	 * @param innerWorks Gets the root directory for the output of the outer job.
+	 * @param jobName Uses the name of the job to save the intermediate file so it can be identified by the job that required it.
+	 * @throws Exception
+	 */
 	
 	@SuppressWarnings({ "rawtypes"})
 	public NestedWriterSF(org.apache.hadoop.mapreduce.Mapper.Context context, 
@@ -42,18 +65,17 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  TaskAttemptID mapInput = context.getTaskAttemptID();  
 	  conf = context.getConfiguration();
 	  
-	  /*
-	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()),conf);
-	  path = new Path("/tmp/inceptions/" + mapInput.toString());
-	  */
-	  
 	  uniqueID = innerWorks + "/inceptions/" + jobName + "/" + mapInput.toString();
-	  ////System.out.println(uniqueID);
 	  fs = FileSystem.get(URI.create(uniqueID),conf);
 	  path = new Path(uniqueID);
 	  FileUtil.chmod(path.toString(), "-rwxr--rwr");
-  
 	}
+	
+	/**
+	 * Used to test the writing a file locally. Not used by the framework, here for reference 
+	 * @param context Uses the {@link Mapper} context get the configuration necessary for writing a SF.
+	 * @throws Exception
+	 */
 	
 	@Deprecated
 	@SuppressWarnings("rawtypes")
@@ -66,6 +88,13 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  path = new Path("/tmp/inceptions/" + mapInput.toString());
 	  
 	}
+	/**
+	 * Creates an intermediate SequenceFile where key/values will be written
+	 * @param context Uses the {@link Reducer} context to configure the SequenceFile writer.
+	 * @param innerWorks Gets the root directory for the output of the outer job.
+	 * @param jobName Uses the name of the job to save the intermediate file so it can be identified by the job that required it.
+	 * @throws Exception
+	 */
 	
 	@SuppressWarnings({ "rawtypes"})
 	public NestedWriterSF(org.apache.hadoop.mapreduce.Reducer.Context context, 
@@ -73,18 +102,19 @@ public class NestedWriterSF implements CommonWriterUtils{
 	
 	  TaskAttemptID mapInput = context.getTaskAttemptID();  
 	  conf = context.getConfiguration();
-	  
-	  /*
-	  fs = FileSystem.get(URI.create("/tmp/inceptions/" + mapInput.toString()),conf);
-	  path = new Path("/tmp/inceptions/" + mapInput.toString());
-	  */
-	  
+
 	  uniqueID = innerWorks + "/inceptions/" + jobName + "/" + mapInput.toString();
 	  fs = FileSystem.get(URI.create(uniqueID),conf);
 	  path = new Path(uniqueID);
-	  FileUtil.chmod(path.toString(), "-rwxr--rwr");
-	  
+	  FileUtil.chmod(path.toString(), "-rwxr--rwr");  
 	}
+	
+	/**
+	 * Used to test the writing a file locally. Not used by the framework, here for reference 
+	 * @param context Uses the {@link Reducer} context get the configuration necessary for writing a SF.
+	 * @throws Exception
+	 */
+	
 	@Deprecated
 	@SuppressWarnings({ "rawtypes"})
 	public NestedWriterSF(org.apache.hadoop.mapreduce.Reducer.Context context) throws Exception{
@@ -96,18 +126,15 @@ public class NestedWriterSF implements CommonWriterUtils{
 	  path = new Path("/tmp/inceptions/" + mapInput.toString());
 	}
 	
+	/**
+	 * Provides an implementation for writing a key/value pair in a SequenceFile.
+	 * It dynamically shapes the content of the SequenceFile as it sets it's type when it creates the first key value pair.
+	 */
+	
 	@Override
 	public void write (Object key, Object value) throws IOException{ 
 		if (writer == null){
 			
-			////System.out.println(key.getClass().getName());
-			////System.out.println(value.getClass().getName());
-			
-			
-			//writer = SequenceFile.createWriter(fs, conf, path, 
-			//	  	key.getClass(),value.getClass());
-			
-			//CompressionType compressionType = new org.apache.hadoop.io.compress.DefaultCodec();
 			writer = SequenceFile.createWriter(fs, conf, path,
 					key.getClass(), value.getClass());
 
@@ -116,10 +143,11 @@ public class NestedWriterSF implements CommonWriterUtils{
 		}else{
 			writer.append(key, value);
 		}
-		
-		////System.out.println("Cica intra aici");
-
 	}
+	
+	/**
+	 * Method for returning the path to the created {@link SequenceFile}
+	 */
 	
 	public Path getPath(){
 		return path;
@@ -130,8 +158,6 @@ public class NestedWriterSF implements CommonWriterUtils{
 	 */
 	@Override
 	public void close(){
-		
-		  IOUtils.closeStream(writer);
-		  
+		  IOUtils.closeStream(writer);	  
 	}
 }

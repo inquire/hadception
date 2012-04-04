@@ -40,7 +40,7 @@ public Path workingPath;
     protected void nestedMap (LongWritable key, Text value, JobTrigger condition) throws IOException, InterruptedException{
 		System.out.println(key + " / " + value);
 		  writer.write(two, value);
-		  condition.setCondition("default");
+		  condition.setCondition("something");
 	  }
     
 	@Override

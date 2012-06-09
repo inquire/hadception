@@ -3,6 +3,8 @@ Hadception
 
 A nested map-reduce framework for the Apache Hadoop Project.
 
+NOTE: 09.06.2012 - project goes into complete code revamp an upgrading internal job dispatch centralisation to a new version
+
 Requirements:
 --------------
 
